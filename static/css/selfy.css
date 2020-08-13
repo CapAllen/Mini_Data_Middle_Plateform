@@ -1,0 +1,59 @@
+/*分页样式*/
+
+.paginate a {
+    display: inline-block;
+    color: #428bca;
+    height: 25px;
+    line-height: 25px;
+    padding: 0 10px;
+    border: 1px solid #ddd;
+    margin: 0 2px;
+    border-radius: 4px;
+    vertical-align: middle;
+    font-family: verdana;
+}
+
+#events .datagrid-sort {
+    display: inline;
+    padding: 0 13px 0 0;
+    background: url('../static/img/datagrid_icons.png') no-repeat -64px center;
+}
+
+#events .datagrid-sort-desc {
+    display: inline;
+    padding: 0 13px 0 0;
+    background: url('../static/img/datagrid_icons.png') no-repeat -16px center;
+}
+
+#events .datagrid-sort-asc {
+    display: inline;
+    padding: 0 13px 0 0;
+    background: url('../static/img/datagrid_icons.png') no-repeat 0px center;
+}
+
+#events td {
+    font-size: 1em;
+    text-align: left;
+    border: 1px solid #98bf21;
+    padding: 3px 7px 2px 7px;
+}
+
+#events input {
+    border: 0;
+    background: transparent;
+    width: 100%;
+}
+
+.red {
+    color: red;
+}
+
+.top {
+    background: #CCCCCC;
+    cursor: pointer;
+}
+
+.tr_select {
+    font-size: 120%;
+    color: red;
+}

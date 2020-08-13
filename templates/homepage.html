@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" name="save" content="history">
+    <title>创研中心数据中台</title>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/colResizable.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/jPaginate.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/selfy.css') }}" rel="stylesheet">
+
+
+    <script src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/jquery.paginate.js')}}"></script>
+    <script src="{{url_for('static', filename='js/colResizable-1.5.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/table_related.js')}}"></script>
+
+
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">数据中台</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item ">
+                    <a class="nav-link" href="/database_manager">数据库管理 <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/">问答系统测试</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                爬虫
+              </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#">西安市教育局</a>
+                        <a class="dropdown-item" href="#">阳光高考</a>
+
+                        <a class="dropdown-item" href="#">知乎</a>
+                    </div>
+                </li>
+
+            </ul>
+            <ul class="navbar-nav ml-0">
+                <li class="nav-item ">
+                    <a class="nav-link" href="/help" tabindex="-1" aria-disabled="true">帮助</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% block database_manager %} {% endblock %}
+    </div>
+</body>
+
+</html>
