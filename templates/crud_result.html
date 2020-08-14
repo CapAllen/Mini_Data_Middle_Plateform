@@ -1,35 +1,186 @@
 {% extends "crud.html" %} {% block crud_result %}
 <form>
-    {{res}}
-    <!-- 分页 -->
-    <!-- <div id="paginationdemo" class="paginate">
-        <div id="paginate"></div>
-    </div>
-    <table data-spy="scroll" id="events" class="table table-hover">
-        <thead>
-            <tr>
-                <th width="40px">选择</th>
-                {% for eng, ch in database_info[table_name]['c_c_dict'].items() %}
-                <th>
-                    <a href="#" id="{{eng}}" name="{{eng}}" sort="">{{ch}}</a>
-                </th>
+
+    <div data-spy="scroll">
+        <table id="events" class="table table-hover">
+            <thead>
+                <tr>
+                    <th width="40px">选择</th>
+                    {% for col in result_data.columns %}
+                    <th>
+                        <a href="#" id="{{col}}" name="{{col}}" sort="">{{database_info[table_name]['c_c_dict'][col]}}</a>
+                    </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+
+            <tbody id="event-info">
+                {% for i in result_data.index %}
+                <tr>
+                    <td><span><input type='checkbox' name='select' id='select' value={{result_data.loc[i,'id']}}></span></td>
+                    {% for col in result_data.columns %}
+                    <td><input id="{{result_data.loc[i,'id']}}&{{col}}" value="{{result_data.loc[i,col]}}"></td>
+                    {% endfor %}
+                </tr>
                 {% endfor %}
-
-                <th width="40px">操作</th>
-            </tr>
-        </thead>
-
-        <tbody id="event-info"> -->
-    <!--表格内容由createTable()动态生成-->
-    <!-- </tbody>
-    </table>
-    <br> -->
-    <!--分页-->
-    <!-- <div id="paginationdemo" class="paginate">
-        <div id="paginate-bottom"></div>
+            </tbody>
+        </table>
     </div>
-    <br>
+
+    <button id="Edit" type="button" class="btn btn-primary">提交修改</button>
     <button id="addRow" type="button" class="btn btn-primary">添加一行</button>
     <button id="mutiple_del" type='button' class="btn btn-primary">删除</button>
-</form> -->
-    {% endblock %}
+</form>
+
+<script type=text/javascript>
+    $(function() {
+        /*点击排序,把search,del,update信息都设为none
+             排序有三种状态：无序，升序，降序，默认为无序，第一次点击为升序，第二次点击为降序，第三次点击为无序*/
+        $('th>a').bind('click', function() {
+            sort = $(this).attr('sort'); //首先取出上次的排序方式
+            //alert(sort);
+            if (sort == '') {
+                $(this).attr('sort', 'asc');
+                $(this).next().attr('class', "datagrid-sort-asc");
+            }
+            if (sort == 'asc') {
+                $(this).attr('sort', 'desc');
+                $(this).next().attr('class', "datagrid-sort-desc");
+            }
+            if (sort == 'desc') {
+                $(this).attr('sort', '');
+                $(this).next().attr('class', "datagrid-sort");
+            }
+            sort = $(this).attr('sort');
+            //alert(sort);
+            if (sort != '') {
+                //alert(sort);
+                keyword = $(this).attr('name');
+                //alert(sort+keyword);
+                $("#sort_info").val(keyword + '&' + sort); //为排序信息输入框赋值，以便后续翻页时取得该值
+                $("#update_info").val('none');
+                $("#del_info").val('none');
+                $("#search_info").val('none');
+                $("#add_info").val('none');
+                show();
+            } else {
+                $("#sort_info").val('none');
+            }
+        });
+
+        //更新操作，input change事件，注册为document（也可以注册为table的事件）的事件是防止表格不存在，因为因为表格是动态生成的
+        $('#event-info').on('change', "td>input", function() {
+            $(this).css("background-color", "#FFFFCC");
+            id = $(this).attr('id');
+            var value = document.getElementById(id).value;
+            //alert(id+value);
+            $("#update_info").val(id + '&' + value); //为修改信息输入框赋值，以便后续翻页时取得该值
+            $("#del_info").val('none');
+            $("#add_info").val('none');
+            current_page = $('#current_page').val();
+            //alert(current_page);
+            show(current_page);
+        });
+
+        //点击删除
+        $(document).on('click', "tbody td>a", function() {
+            //$('td a').bind('click', function(){
+            id = $(this).attr('id'); //被删除数据的id
+            alert(id);
+            $("#del_info").val(id); //为删除信息输入框赋值
+            $("#update_info").val('none');
+            $("#add_info").val('none');
+            //alert($("#sort_info").val());
+            current_page = $('#current_page').val();
+            show(current_page);
+        });
+
+        //添加一行
+        $('#addRow').bind('click', function() {
+            addRow();
+        });
+
+        $(document).on('click', "#addSure", function() {
+            //$('td a').bind('click', function(){
+            itemid = $('input[name="addItemid"]').val();
+            sid = $('input[name="addSid"]').val();
+            expo_name = $('input[name="addExpoName"]').val();
+            start_date = $('input[name="addStartDate"]').val();
+            end_date = $('input[name="addEndDate"]').val();
+            city_name = $('input[name="addCityName"]').val();
+            unit_name = $('input[name="addUnitName"]').val();
+            unit_code = $('input[name="addUnitCode"]').val();
+            site = $('input[name="addSite"]').val();
+            exhibitor = $('input[name="addExhibitor"]').val();
+            visitor = $('input[name="addVisitor"]').val();
+            expo_area = $('input[name="addExpoArea"]').val();
+            get_date = $('input[name="addGetDate"]').val();
+            $("#add_info").val(itemid + '&' + sid + '&' + expo_name + '&' + unit_code + '&' + unit_name + '&' + city_name + '&' + start_date + '&' + end_date + '&' + site + '&' + exhibitor + '&' + visitor + '&' + expo_area + '&' + get_date); //为排序信息输入框赋值，以便后续翻页时取得该值
+            alert($("#add_info").val());
+            $("#update_info").val('none');
+            $("#del_info").val('none');
+            current_page = $('#current_page').val();
+            show(current_page);
+        });
+
+        //根据复选框状态进行删除
+        $('#mutiple_del').bind('click', function() {
+            var ids = "";
+            $('input[type="checkbox"][name="select"]:checked').each(function() {
+                ids = ids + "&" + $(this).val();
+                $(this).css("background-color", "#FFFFCC");
+            });
+            ids = ids.substring(1, ids.Length);
+            if (ids) {
+                alert(ids);
+                //$("#del_info").attr("value",ids);
+                $("#del_info").val(ids);
+                $("#update_info").val('none');
+                //$("#search_info").val();
+                current_page = $('#current_page').val();
+                show(current_page);
+            } else {
+                alert('请至少选择一项！');
+                return false;
+            }
+        });
+
+        //选中行变色
+        $('#event-info').on('change', "td>span>input", function() {
+            $(this).parent().parent().parent().toggleClass("tr_select");
+        });
+
+        //添加一行
+        function addRow() {
+            $('#event-info').append(
+                "<tr>" +
+                "<td></td>" +
+                "<td></td>" +
+                "<td><span>" + "<input " + "name=" + "addItemid" + " value=''" + ">" + "</span></td>" +
+                "<td><span>" + "<input " + "name=" + "addSid" + " value=''" + ">" + "</span></td>" +
+                "<td><span>" + "<input " + "name=" + "addExpoName" + " value=''" + ">" + "</span></td>" +
+                "<td><span>" + "<input " + "name=" + "addUnitCode" + " value=''" + ">" + "</span></td>" +
+                "<td><span>" + "<input " + "name=" + "addUnitName" + " value=''" + ">" + "</span></td>" +
+                "<td><span>" + "<input " + "name=" + "addCityName" + " value=''" + ">" + "</span></td>" +
+                "<td><span>" + "<input " + "name=" + "addStartDate" + " value=''" + ">" + "</span></td>" +
+                "<td><span>" + "<input " + "name=" + "addEndDate" + " value=''" + ">" + "</span></td>" +
+                "<td><span>" + "<input " + "name=" + "addSite" + " value=''" + ">" + "</span></td>" +
+                "<td><span>" + "<input " + "name=" + "addExhibitor" + " value=''" + ">" + "</span></td>" +
+                "<td><span>" + "<input " + "name=" + "addVisitor" + " value=''" + ">" + "</span></td>" +
+                "<td><span>" + "<input " + "name=" + "addExpoArea" + " value=''" + ">" + "</span></td>" +
+                "<td><span>" + "<input " + "name=" + "addGetDate" + " value=''" + ">" + "</span></td>" +
+                "<td><span><a href='#' id='addSure'" + ">" + 'add' + "</a></span></td>" +
+                "</tr>");
+        }
+
+        //拖动改变表格宽度
+        $(function() {
+            $("#events").colResizable({
+                liveDrag: true,
+                gripInnerHtml: "<div class='grip'></div>",
+                draggingClass: "dragging"
+            });
+        });
+    });
+</script>
+{% endblock %}

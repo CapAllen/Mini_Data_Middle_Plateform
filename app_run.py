@@ -44,12 +44,14 @@ def go_crud():
 @app.route('/crud_result', methods=['GET', 'POST'])
 def go_crud_result():
     if request.method == 'POST':
-        res = request.form
+        table_name = request.form['db_name']
+        result_data = query_data(request.form)
+        print(result_data.shape)
 
         return render_template('crud_result.html',
-                                # table_name=table_name,
+                                table_name=table_name,
                                database_info=database_info,
-                               res=res)
+                               result_data=result_data)
                             #    ,
                             #    database_info=database_info)
 
@@ -60,6 +62,7 @@ def go_help():
         'help.html',
 
     )
+
 
 # @app.route('/getargs/')
 # def getArgs():
