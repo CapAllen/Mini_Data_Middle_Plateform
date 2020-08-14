@@ -1,0 +1,35 @@
+{% extends "crud.html" %} {% block crud_result %}
+<form>
+    {{res}}
+    <!-- 分页 -->
+    <!-- <div id="paginationdemo" class="paginate">
+        <div id="paginate"></div>
+    </div>
+    <table data-spy="scroll" id="events" class="table table-hover">
+        <thead>
+            <tr>
+                <th width="40px">选择</th>
+                {% for eng, ch in database_info[table_name]['c_c_dict'].items() %}
+                <th>
+                    <a href="#" id="{{eng}}" name="{{eng}}" sort="">{{ch}}</a>
+                </th>
+                {% endfor %}
+
+                <th width="40px">操作</th>
+            </tr>
+        </thead>
+
+        <tbody id="event-info"> -->
+    <!--表格内容由createTable()动态生成-->
+    <!-- </tbody>
+    </table>
+    <br> -->
+    <!--分页-->
+    <!-- <div id="paginationdemo" class="paginate">
+        <div id="paginate-bottom"></div>
+    </div>
+    <br>
+    <button id="addRow" type="button" class="btn btn-primary">添加一行</button>
+    <button id="mutiple_del" type='button' class="btn btn-primary">删除</button>
+</form> -->
+    {% endblock %}

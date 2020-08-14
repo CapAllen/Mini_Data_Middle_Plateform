@@ -1,40 +1,24 @@
-{% extends "homepage.html" %} {% block title %}Results{% endblock %} {% block database_manager %}
+{% extends "homepage.html" %} {% block database_manager %}
 <h1 class="text-center">数据库管理</h1>
 <p class="text-muted">目前可实现对数据库中单表的增、删、改、查，支持上传、下载Excel文件。</p>
 <p class="text-muted"><strong>初次使用？请戳<a href=" /help ">使用手册</a></strong></p>
 
 <div class="container">
+    {% for table_name in tables %} {% if database_info.get(table_name) %}
     <div class="row">
-        <div class="col">
+        <div class="col mt-3">
             <div class="card" style="width: 18rem;">
                 <img src="..." class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h5 class="card-title">Card title</h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
-                </div>
+                <form class="card-body" action="/crud" method="get">
+                    <input name="db_name" type="hidden" value={{table_name}}>
+                    <h5 class="card-title">{{database_info[table_name]['in_chinese']}}</h5>
+                    <p class="card-text">{{database_info[table_name]['desc']}}</p>
+                    <button type="submit" class="btn btn-primary">选择</button>
+                </form>
             </div>
         </div>
-        <div class="col">
-            <div class="card" style="width: 18rem;">
-                <img src="..." class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h5 class="card-title">Card title</h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card" style="width: 18rem;">
-                <img src="..." class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h5 class="card-title">Card title</h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
-                </div>
-            </div>
-        </div>
+        {% else %} {% endif %} {% endfor %}
+
         <div class="w-100"></div>
 
     </div>
