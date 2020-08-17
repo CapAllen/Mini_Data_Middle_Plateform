@@ -1,6 +1,11 @@
+import json
 import pymysql
 import config
 import pandas as pd
+
+# read database info
+with open('docs/database_info.json', encoding='utf-8') as f:
+    database_info = json.load(f)
 
 # connect mysql
 con = pymysql.connect(
@@ -13,14 +18,15 @@ con = pymysql.connect(
 def query_data(form_dict):
     
     table_name = form_dict['db_name']
-    select_str = ''
+    c_c_dict = database_info[table_name]['c_c_dict']
+    select_lst = list(c_c_dict.keys())
     where_str = ''
 
     for col, query in list(form_dict.items())[1:]:
         query = ' ' if not query else query.replace(' ','')
         # select 部分
-        if query[0].upper() != 'X':
-            select_str = select_str + col + ','
+        if query[0].upper() == 'X':
+            select_lst.remove(col)
         
         # where 部分
         if query[0] == 'i':
@@ -37,7 +43,7 @@ def query_data(form_dict):
                 raise Exception('输入有误。')
 
     
-    select_str = select_str[:-1]
+    select_str = ','.join(select_lst)
     where_str = where_str[:-4]
     
     if where_str:
@@ -47,4 +53,54 @@ def query_data(form_dict):
     result = pd.read_sql(query_str,con=con)
 
     return result
+
+# 修改/删除数据
+def edit_data(form_dict):
+    table_name = form_dict['db_name']
+    c_c_dict = database_info[table_name]['c_c_dict']
+    select_lst = list(c_c_dict.keys())
+
+    # 新旧数据
+    new = [x for x in list(form_data.keys())[1:] if 'new' in x]
+    old = [x for x in list(form_data.keys())[1:] if x not in new ]
+    new = sorted(list(set([x.split('&')[0] for x in new])))
+    old = sorted(list(set([x.split('&')[0] for x in old])))
+
+    # 修改一条旧数据
+    def edit_old_data(old_id):
+        # 对于old数据
+        # 筛选出对应id的数据
+        tables = pd.read_sql(f'SELECT * FROM gaokao.{table_name} WHERE id={old_id}',con=con)
+        # 将其转换为dict
+        old_dict = tables.to_dict(orient='records')[0]
+        # 新的数据转为dict，然后更新原dict
+        new_dict = {key.split('&')[1]:value for key,value in form_data.items() if old_id in key}
+        old_dict.update(new_dict)
+        # replace到数据库中
+        keys = ','.join(list(old_dict.keys()))
+        values = ','.join([f"'{val}'" for val in list(old_dict.values())])
+        replace_str = f'REPLACE INTO gaokao.{table_name} ({keys}) VALUES ({values})' 
+        cursor = con.cursor()
+        cursor.execute(replace_str)
+        con.commit()
+
+    for old_id in old:
+        edit_old_data(old_id)
+
+    # 对于new数据
+    # 获取当前id的最大值
+    max_id = pd.read_sql(f'SELECT MAX(id) FROM gaokao.{table_name}',con=con)
+    # 直接replace到数据库中
+    for new_id in new:
+        new_dict = {key.split('&')[2]:value for key,value in form_data.items() if new_id in key}
+        new_dict['id'] = int(max_id.iloc[0,0]) + 1
+        keys = ','.join(list(new_dict.keys()))
+        values = ','.join([f"'{val}'" for val in list(new_dict.values())])
+        replace_str = f'REPLACE INTO gaokao.{table_name} ({keys}) VALUES ({values})' 
+        cursor = con.cursor()
+        cursor.execute(replace_str)
+        con.commit()
+
+
+    
 

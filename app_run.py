@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-import json
+import redis
 from database import *
 from flask import Flask, request, render_template, jsonify, json, redirect, url_for
 
 
 app = Flask(__name__)
 
-with open('docs/database_info.json', encoding='utf-8') as f:
-    database_info = json.load(f)
+pool = redis.ConnectionPool(host='localhost', port=6379, decode_responses=True) 
+r = redis.Redis(connection_pool=pool)
 
 
 
@@ -36,26 +36,67 @@ def go_database_manager():
 def go_crud():
     if request.method == 'GET':
         table_name = request.args.get('db_name', '')
-
+        table_name_ch = database_info[table_name]['in_chinese']
+        cc_lst = list(database_info[table_name]['c_c_dict'].items())[1:]
         return render_template('crud.html',
                                table_name=table_name,
-                               database_info=database_info)
+                               table_name_ch=table_name_ch,
+                               cc_lst=cc_lst)
+
 
 @app.route('/crud_result', methods=['GET', 'POST'])
 def go_crud_result():
     if request.method == 'POST':
         table_name = request.form['db_name']
+        table_name_ch = database_info[table_name]['in_chinese']
+        cc_lst = list(database_info[table_name]['c_c_dict'].items())[1:]
+
         result_data = query_data(request.form)
+        
+        # 保存最近一次的筛选信息
+        r.set('resent_query',str(request.form))
+
         print(result_data.shape)
 
         return render_template('crud_result.html',
                                 table_name=table_name,
+                                table_name_ch=table_name_ch,
+                               cc_lst=cc_lst,
                                database_info=database_info,
                                result_data=result_data)
                             #    ,
                             #    database_info=database_info)
 
-@app.route('/help')
+@app.route('/crud_edit', methods=['GET', 'POST'])
+def go_crud_edit():
+    if request.method == 'POST':
+
+        # 读取最近一次的筛选信息
+        resent_query = eval(r.get('resent_query'))
+
+        table_name = resent_query['db_name']
+        table_name_ch = database_info[table_name]['in_chinese']
+        cc_lst = list(database_info[table_name]['c_c_dict'].items())[1:]
+
+        edit_dict = request.form
+
+        print(edit_dict)
+        # 依据edit_dict进行mysql操作
+        edit_data(edit_dict)
+
+        # 按最近一次的筛选条件返回操作后的数据
+        result_data = query_data(resent_query)
+        
+
+        return render_template('crud_edit.html',
+                                table_name=table_name,
+                                table_name_ch=table_name_ch,
+                               cc_lst=cc_lst,
+                               database_info=database_info,
+                               result_data=result_data
+                               )
+
+@app.route('/help', methods=['GET', 'POST'])
 def go_help():
 
     return render_template(

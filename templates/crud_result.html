@@ -1,72 +1,50 @@
 {% extends "crud.html" %} {% block crud_result %}
-<form>
-
-    <div data-spy="scroll">
-        <table id="events" class="table table-hover">
-            <thead>
-                <tr>
-                    <th width="40px">选择</th>
-                    {% for col in result_data.columns %}
-                    <th>
-                        <a href="#" id="{{col}}" name="{{col}}" sort="">{{database_info[table_name]['c_c_dict'][col]}}</a>
-                    </th>
-                    {% endfor %}
-                </tr>
-            </thead>
-
-            <tbody id="event-info">
-                {% for i in result_data.index %}
-                <tr>
-                    <td><span><input type='checkbox' name='select' id='select' value={{result_data.loc[i,'id']}}></span></td>
-                    {% for col in result_data.columns %}
-                    <td><input id="{{result_data.loc[i,'id']}}&{{col}}" value="{{result_data.loc[i,col]}}"></td>
-                    {% endfor %}
-                </tr>
+<form action="/crud_edit" method="POST" name="idiot" enctype=multipart/form-data>
+    <table id="events" class="table table-hover">
+        <!-- <table class="table table-hover" id="example"> -->
+        <thead>
+            <tr>
+                <th width="40px">选择</th>
+                {% for col in result_data.columns.tolist()[1:] %}
+                <th>
+                    {{database_info[table_name]['c_c_dict'][col]}}
+                </th>
                 {% endfor %}
-            </tbody>
-        </table>
-    </div>
+            </tr>
+        </thead>
 
-    <button id="Edit" type="button" class="btn btn-primary">提交修改</button>
+        <tbody id="event-info">
+            {% for i in result_data.index %}
+            <tr>
+                <td><span><input type='checkbox' name='select' id='select' value={{result_data.loc[i,'id']}}></span></td>
+
+                {% for col in result_data.columns.tolist()[1:] %}
+                <td><input id="{{result_data.loc[i,'id']}}&{{col}}" name="{{result_data.loc[i,'id']}}&{{col}}" value="{{result_data.loc[i,col]}}"></td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
     <button id="addRow" type="button" class="btn btn-primary">添加一行</button>
-    <button id="mutiple_del" type='button' class="btn btn-primary">删除</button>
+    <button onclick="edit()" type="button" class="btn btn-primary">提交修改</button>
+    <button onclick="delet()" type='button' class="btn btn-primary">删除</button>
 </form>
+{% block crud_edit %} {% endblock %}
 
 <script type=text/javascript>
+    function edit() {　　　　　
+        document.idiot.action = "/crud_edit";
+        document.idiot.submit();
+    }
+
+    function delet() {
+        document.idiot.action = "/help";
+        document.idiot.submit();
+    }
+
     $(function() {
-        /*点击排序,把search,del,update信息都设为none
-             排序有三种状态：无序，升序，降序，默认为无序，第一次点击为升序，第二次点击为降序，第三次点击为无序*/
-        $('th>a').bind('click', function() {
-            sort = $(this).attr('sort'); //首先取出上次的排序方式
-            //alert(sort);
-            if (sort == '') {
-                $(this).attr('sort', 'asc');
-                $(this).next().attr('class', "datagrid-sort-asc");
-            }
-            if (sort == 'asc') {
-                $(this).attr('sort', 'desc');
-                $(this).next().attr('class', "datagrid-sort-desc");
-            }
-            if (sort == 'desc') {
-                $(this).attr('sort', '');
-                $(this).next().attr('class', "datagrid-sort");
-            }
-            sort = $(this).attr('sort');
-            //alert(sort);
-            if (sort != '') {
-                //alert(sort);
-                keyword = $(this).attr('name');
-                //alert(sort+keyword);
-                $("#sort_info").val(keyword + '&' + sort); //为排序信息输入框赋值，以便后续翻页时取得该值
-                $("#update_info").val('none');
-                $("#del_info").val('none');
-                $("#search_info").val('none');
-                $("#add_info").val('none');
-                show();
-            } else {
-                $("#sort_info").val('none');
-            }
-        });
+
 
         //更新操作，input change事件，注册为document（也可以注册为table的事件）的事件是防止表格不存在，因为因为表格是动态生成的
         $('#event-info').on('change', "td>input", function() {
@@ -152,25 +130,27 @@
 
         //添加一行
         function addRow() {
-            $('#event-info').append(
-                "<tr>" +
-                "<td></td>" +
-                "<td></td>" +
-                "<td><span>" + "<input " + "name=" + "addItemid" + " value=''" + ">" + "</span></td>" +
-                "<td><span>" + "<input " + "name=" + "addSid" + " value=''" + ">" + "</span></td>" +
-                "<td><span>" + "<input " + "name=" + "addExpoName" + " value=''" + ">" + "</span></td>" +
-                "<td><span>" + "<input " + "name=" + "addUnitCode" + " value=''" + ">" + "</span></td>" +
-                "<td><span>" + "<input " + "name=" + "addUnitName" + " value=''" + ">" + "</span></td>" +
-                "<td><span>" + "<input " + "name=" + "addCityName" + " value=''" + ">" + "</span></td>" +
-                "<td><span>" + "<input " + "name=" + "addStartDate" + " value=''" + ">" + "</span></td>" +
-                "<td><span>" + "<input " + "name=" + "addEndDate" + " value=''" + ">" + "</span></td>" +
-                "<td><span>" + "<input " + "name=" + "addSite" + " value=''" + ">" + "</span></td>" +
-                "<td><span>" + "<input " + "name=" + "addExhibitor" + " value=''" + ">" + "</span></td>" +
-                "<td><span>" + "<input " + "name=" + "addVisitor" + " value=''" + ">" + "</span></td>" +
-                "<td><span>" + "<input " + "name=" + "addExpoArea" + " value=''" + ">" + "</span></td>" +
-                "<td><span>" + "<input " + "name=" + "addGetDate" + " value=''" + ">" + "</span></td>" +
-                "<td><span><a href='#' id='addSure'" + ">" + 'add' + "</a></span></td>" +
-                "</tr>");
+            var count = document.getElementById("events").rows.length;
+            // 获取最后一行的id
+            var last_id = document.getElementById("events").rows[count - 1].cells[0].children[0].children[0].value;
+            var cols = document.getElementById("events").rows[count - 2].cells
+            var new_id = parseInt(last_id) + 1
+            console.log(last_id);
+            var new_tr = "<tr><td><span><input type=\"checkbox\" name=\"select\" id=\"select\" value=" + new_id + "&new" +
+                "></span></td>"
+
+            // 新添加一行，id均为最后一行id+1&new&colname
+            // 还需要获取colname列表
+            // 然后循环
+            for (i = 1; i < cols.length; i++) {
+                var colname = cols[i].children[0].id.split('&')[1];
+                new_tr += "<td><input id=" + new_id + "&amp;" + colname + " name=" + new_id + "&new" + "&amp;" + colname + " value=\"\"></td>"
+
+            }
+            new_tr += "</tr>"
+
+            $('#event-info').append(new_tr)
+
         }
 
         //拖动改变表格宽度

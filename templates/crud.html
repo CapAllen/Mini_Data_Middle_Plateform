@@ -1,11 +1,11 @@
 {% extends "homepage.html" %} {% block database_manager %}
-<h2 class="text-center mt-3 ">{{database_info[table_name]['in_chinese']}}</h2>
+<h2 class="text-center mt-3 ">{{table_name_ch}}</h2>
 
 
 <form action="/crud_result" method="POST" enctype=multipart/form-data>
 
     <div class="form-row">
-        <input name="db_name" type="hidden" value={{table_name}}> {% for eng, ch in database_info[table_name]['c_c_dict'].items() %}
+        <input name="db_name" type="hidden" value={{table_name}}> {% for eng, ch in cc_lst %}
         <div class="col-3 mt-2">
             <input type="text" name="{{eng}}" class="form-control" placeholder="{{ch}}">
         </div>
@@ -16,4 +16,4 @@
     <button id="search" type="submit" class="btn btn-primary mt-2 mb-2">提交</button>
 </form>
 
-{% endblock %}
+{% endblock %} {% block crud_result %} {% endblock %}
