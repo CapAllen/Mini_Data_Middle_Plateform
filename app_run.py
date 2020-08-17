@@ -54,7 +54,8 @@ def go_crud_result():
         result_data = query_data(request.form)
         
         # 保存最近一次的筛选信息
-        r.set('resent_query',str(request.form))
+        imut_str = str(request.form)
+        r.set('resent_query',str(dict(eval(imut_str[imut_str.index('('):]))))
 
         print(result_data.shape)
 
@@ -68,6 +69,7 @@ def go_crud_result():
                             #    database_info=database_info)
 
 @app.route('/crud_edit', methods=['GET', 'POST'])
+@app.route('/crud_delete', methods=['GET', 'POST'])
 def go_crud_edit():
     if request.method == 'POST':
 
@@ -79,10 +81,13 @@ def go_crud_edit():
         cc_lst = list(database_info[table_name]['c_c_dict'].items())[1:]
 
         edit_dict = request.form
-
-        print(edit_dict)
+        
+        # 检查是否有选中项（删除项）
+        imut_str = str(edit_dict)
+        imut_tuple = eval(imut_str[imut_str.index('('):])
+        delete_ids = [x[1] for x in imut_tuple if x[0]=='select']
         # 依据edit_dict进行mysql操作
-        edit_data(edit_dict)
+        # edit_data(table_name,edit_dict,delete_ids)
 
         # 按最近一次的筛选条件返回操作后的数据
         result_data = query_data(resent_query)
@@ -95,6 +100,8 @@ def go_crud_edit():
                                database_info=database_info,
                                result_data=result_data
                                )
+
+
 
 @app.route('/help', methods=['GET', 'POST'])
 def go_help():

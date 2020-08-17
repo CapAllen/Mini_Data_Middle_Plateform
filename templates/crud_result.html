@@ -4,7 +4,7 @@
         <!-- <table class="table table-hover" id="example"> -->
         <thead>
             <tr>
-                <th width="40px">选择</th>
+                <th width="40px">标记删除</th>
                 {% for col in result_data.columns.tolist()[1:] %}
                 <th>
                     {{database_info[table_name]['c_c_dict'][col]}}
@@ -28,18 +28,13 @@
 
     <button id="addRow" type="button" class="btn btn-primary">添加一行</button>
     <button onclick="edit()" type="button" class="btn btn-primary">提交修改</button>
-    <button onclick="delet()" type='button' class="btn btn-primary">删除</button>
+
 </form>
 {% block crud_edit %} {% endblock %}
 
 <script type=text/javascript>
     function edit() {　　　　　
         document.idiot.action = "/crud_edit";
-        document.idiot.submit();
-    }
-
-    function delet() {
-        document.idiot.action = "/help";
         document.idiot.submit();
     }
 

@@ -55,10 +55,19 @@ def query_data(form_dict):
     return result
 
 # 修改/删除数据
-def edit_data(form_dict):
-    table_name = form_dict['db_name']
+def edit_data(table_name,form_data,delete_ids):
+    
     c_c_dict = database_info[table_name]['c_c_dict']
     select_lst = list(c_c_dict.keys())
+    
+    # 删除数据
+    if delete_ids:
+        for delete_id in delete_ids:
+            delete_str = f'DELETE FROM gaokao.{table_name} WHERE (id = {delete_id});' 
+            cursor = con.cursor()
+            cursor.execute(delete_str)
+            con.commit()
+        print('删除成功')
 
     # 新旧数据
     new = [x for x in list(form_data.keys())[1:] if 'new' in x]
@@ -86,6 +95,7 @@ def edit_data(form_dict):
 
     for old_id in old:
         edit_old_data(old_id)
+        print('旧数据处理完成')
 
     # 对于new数据
     # 获取当前id的最大值
@@ -100,6 +110,7 @@ def edit_data(form_dict):
         cursor = con.cursor()
         cursor.execute(replace_str)
         con.commit()
+        print('新数据处理完成')
 
 
     
