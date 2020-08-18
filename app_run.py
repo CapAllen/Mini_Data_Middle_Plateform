@@ -84,8 +84,9 @@ def go_crud_edit():
         # 检查是否有选中项（删除项）
         imut_str = str(edit_dict)
         imut_tuple = eval(imut_str[imut_str.index('('):])
-        delete_ids = [x[1] for x in imut_tuple if x[0]=='select' and 'new' not in x[1]]
+        delete_ids = [x[1] for x in imut_tuple if x[0]=='select']
 
+        print(delete_ids)
         # 依据edit_dict进行mysql操作
         edit_data(table_name,edit_dict,delete_ids)
 

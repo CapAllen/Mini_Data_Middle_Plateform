@@ -1,7 +1,7 @@
 {% extends "crud.html" %} {% block crud_result %}
 <form action="/crud_edit" method="POST" name="idiot" enctype=multipart/form-data>
     <table id="events" class="table table-hover" data-toggle="table" data-search="true" data-height="500">
-        <!-- <table class="table table-hover" id="example"> -->
+
         <thead>
             <tr>
                 <th>标记删除</th>
@@ -19,7 +19,7 @@
                 <td><span><input type='checkbox' name='select' id='select' value={{result_data.loc[i,'id']}}></span></td>
 
                 {% for col in result_data.columns.tolist()[1:] %}
-                <td><input id={{result_data.loc[i,col]}} name="{{result_data.loc[i,'id']}}&{{col}}" value="{{result_data.loc[i,col]}}"></td>
+                <td><input id="{{result_data.loc[i,'id']}}&{{col}}" name="{{result_data.loc[i,'id']}}&{{col}}" value="{{result_data.loc[i,col]}}"></td>
                 {% endfor %}
             </tr>
             {% endfor %}
