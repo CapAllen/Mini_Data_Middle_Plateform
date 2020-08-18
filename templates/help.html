@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" name="save" content="history">
+    <title>创研中心数据中台</title>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <link href="{{ url_for('static', filename='css/jPaginate.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/selfy.css') }}" rel="stylesheet">
+
+
+    <script src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/jquery.paginate.js')}}"></script>
+    <script src="{{url_for('static', filename='js/colResizable-1.5.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/table_related.js')}}"></script>
+    <script src="{{url_for('static', filename='js/base-loading.js')}}"></script>
+    <!-- <script src="{{url_for('static', filename='js/dataTables.bootstrap4.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/jquery.dataTables.min.js')}}"></script> -->
+
+
+    <link href="{{ url_for('static', filename='style/github-bf51422f4bb36427d391e4b75a1daa083c2d840e.css')}}" media="all" rel="stylesheet" type="text/css" />
+    <link href="{{ url_for('static', filename='style/github2-d731afd4f624c99a4b19ad69f3083cd6d02b81d5.css')}}" media="all" rel="stylesheet" type="text/css" />
+    <link href="{{ url_for('static', filename='css/zTreeStyle/zTreeStyle.css')}}" media="all" rel="stylesheet" type="text/css" />
+    <style>
+        pre {
+            counter-reset: line-numbering;
+            border: solid 1px #d9d9d9;
+            border-radius: 0;
+            background: #fff;
+            padding: 0;
+            line-height: 23px;
+            margin-bottom: 30px;
+            white-space: pre;
+            overflow-x: auto;
+            word-break: inherit;
+            word-wrap: inherit;
+        }
+        
+        pre a::before {
+            content: counter(line-numbering);
+            counter-increment: line-numbering;
+            padding-right: 1em;
+            /* space after numbers */
+            width: 25px;
+            text-align: right;
+            opacity: 0.7;
+            display: inline-block;
+            color: #aaa;
+            background: #eee;
+            margin-right: 16px;
+            padding: 2px 10px;
+            font-size: 13px;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        pre a:first-of-type::before {
+            padding-top: 10px;
+        }
+        
+        pre a:last-of-type::before {
+            padding-bottom: 10px;
+        }
+        
+        pre a:only-of-type::before {
+            padding: 10px;
+        }
+        
+        .highlight {
+            background-color: #ffffcc
+        }
+        /* RIGHT */
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">数据中台</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item ">
+                    <a class="nav-link" href="/database_manager">数据库管理 <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/">问答系统测试</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                爬虫
+              </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#">西安市教育局</a>
+                        <a class="dropdown-item" href="#">阳光高考</a>
+
+                        <a class="dropdown-item" href="#">知乎</a>
+                    </div>
+                </li>
+
+            </ul>
+            <ul class="navbar-nav ml-0">
+                <li class="nav-item ">
+                    <a class="nav-link" href="/help" tabindex="-1" aria-disabled="true">帮助</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+        <div>
+            <div style='width:25%;'>
+                <ul id="tree" class="ztree" style='width:100%'>
+
+                </ul>
+            </div>
+            <div id='readme' style='width:95%;margin-left:15%;'>
+                <article class='markdown-body'>
+                    <blockquote>
+                        <p>日期：2020-08-17</p>
+                        <p>版本：V0.1</p>
+                    </blockquote>
+                    <h1 id="-">基本介绍</h1>
+                    <p>本数据微中台项目，只服务于部门内部，方便各位及时把控教育相关动向、运营方法策略；自主完成数据库的增删改查；按需爬取市教育局、阳光高考、知乎等平台信息；按需自主完成高校卡片、同位次流向等数据产品的制作等，更多功能会陆续完善。</p>
+                    <p>根据如上需求，本文档侧重于数据微中台自主操作的从0到1教程，主要包括：</p>
+                    <ul>
+                        <li>数据库管理</li>
+                        <li>爬虫</li>
+                        <li>数据产品制作</li>
+                    </ul>
+                    <h1 id="-">数据库管理</h1>
+                    <h2 id="-">选择数据库</h2>
+                    <ul>
+                        <li>点击导航栏中的<strong>数据库管理</strong>，即可进入『数据库选择』页面</li>
+                    </ul>
+                    <p><img src="{{ url_for('static', filename='img/1597657711722.png')}}" alt="1597657711722"></p>
+                    <ul>
+                        <li>点击数据库下方的『选择』，即可进入对应数据库</li>
+                    </ul>
+                    <p><img src="{{ url_for('static', filename='img/1597657757284.png')}}" alt="1597657757284"></p>
+                    <h2 id="-">数据筛选</h2>
+                    <ul>
+                        <li>在进入数据库后，可在对应列的输入框中输入筛选条件，规则如下：</li>
+                    </ul>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>符号</th>
+                                <th>解释</th>
+                                <th>示例</th>
+                                <th>示例解释</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>=</td>
+                                <td>筛选该列中<strong>等于</strong>某值的数据</td>
+                                <td>= 江南大学</td>
+                                <td>筛选出所有江南大学的数据</td>
+                            </tr>
+                            <tr>
+                                <td>&gt;</td>
+                                <td>筛选该列中<strong>大于</strong>某值的数据</td>
+                                <td>> 500</td>
+                                <td>筛选出所有大于500的数据</td>
+                            </tr>
+                            <tr>
+                                <td>&lt;</td>
+                                <td>筛选该列中<strong>小于</strong>某值的数据</td>
+                                <td>&lt; 500</td>
+                                <td>筛选出所有小于500的数据</td>
+                            </tr>
+                            <tr>
+                                <td>!</td>
+                                <td>筛选该列<strong>不等于</strong>某值的数据</td>
+                                <td>! 2015</td>
+                                <td>筛选出不等于2015的数据</td>
+                            </tr>
+                            <tr>
+                                <td>in</td>
+                                <td>筛选该列<strong>取某些值</strong>的数据</td>
+                                <td>in 北京，天津，上海</td>
+                                <td>筛选出北京，天津和上海的数据</td>
+                            </tr>
+                            <tr>
+                                <td>x</td>
+                                <td><strong>不筛选</strong>某列</td>
+                                <td>x</td>
+                                <td>标记在哪列，则哪列不被筛选</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <blockquote>
+                        <p>在如下规则中：</p>
+                        <ul>
+                            <li>首字必须是『符号』；</li>
+                            <li>符号后有无空格均可；</li>
+                            <li>符号不区分中英文和大小写；</li>
+                        </ul>
+                        <p><img src="{{ url_for('static', filename='img/Skull.png')}}" width="40">
+                            <font color="#d81e06">如果非必需，最好不要筛选出全部数据，否则浏览器会因为数据量太大而崩溃！</font>
+                        </p>
+                    </blockquote>
+                    <p>支持多条件筛选，如下图所示，筛选出江南大学在北京、天津的招生数据，但不包含批次线：</p>
+                    <p><img src="{{ url_for('static', filename='img/1597658607069.png')}}" alt="1597658607069"></p>
+                    <ul>
+                        <li>完成规则输入后，点击『提交』按钮，即可获得筛选结果</li>
+                    </ul>
+                    <p><img src="{{ url_for('static', filename='img/1597660476374.png')}}" alt="1597660476374"></p>
+                    <h2 id="-">修改、添加、删除数据</h2>
+                    <h3 id="-">修改</h3>
+                    <ul>
+                        <li>只需点击相应文本框，进行修改即可，已修改的数据会标记颜色。如下所示</li>
+                    </ul>
+                    <p><img src="{{ url_for('static', filename='img/1597660491057.png')}}" alt="1597660491057"></p>
+                    <h3 id="-">添加</h3>
+                    <ul>
+                        <li>点击下方『添加一行』按钮，在最下方新出现的空白行中，输入数据即可。如下图，添加“江北大学”数据。</li>
+                    </ul>
+                    <blockquote>
+                        <p>注意：在添加数据时，一定要<strong>保证新输入的数据与原始数据类型相同</strong>，如院校名称为文本数据，那就必须在下面输入文本，分数必须输入数字，若当前还未收集到该数据，对于<strong>文本可以用<code>-</code>填充</strong>，<strong>数字用<code>-1</code>填充</strong>。</p>
+                    </blockquote>
+                    <p><img src="{{ url_for('static', filename='img/1597660537775.png')}}" alt="1597660537775"></p>
+                    <h3 id="-">删除</h3>
+                    <ul>
+                        <li>在左侧的『标记删除』中，勾选想要删除的数据即可。</li>
+                    </ul>
+                    <p><img src="{{ url_for('static', filename='img/1597660666048.png')}}" alt="1597660666048"></p>
+                    <h3 id="-">提交修改</h3>
+                    <p>在完成上述数据修改、添加或删除动作后，点击『提交修改』按钮，即可将所有修改、添加、删除的数据更新到数据库中，并得到更新后的数据。</p>
+                    <h2 id="-">下载数据</h2>
+                    <p>在完成筛选或提交修改后，可点击『点击下载』按钮，即可下载当前显示数据的Excel文件。</p>
+
+                </article>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-1.4.4.min.js')}}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.ztree.all-3.5.min.js')}}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/ztree_toc.js')}}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/toc_conf.js')}}"></script>
+
+<SCRIPT type="text/javascript">
+    $(document).ready(function() {
+        var css_conf = eval(markdown_panel_style);
+        $('#readme').css(css_conf)
+
+        var conf = eval(jquery_ztree_toc_opts);
+        $('#tree').ztree_toc(conf);
+    });
+</SCRIPT>

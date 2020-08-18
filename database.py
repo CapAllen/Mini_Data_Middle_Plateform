@@ -1,4 +1,5 @@
 import json
+import redis
 import pymysql
 import config
 import pandas as pd
@@ -13,6 +14,10 @@ con = pymysql.connect(
     user=config.USER,
     password=config.PW,
     database=config.DB)
+
+# connect redis
+pool = redis.ConnectionPool(host=config.REDIS_HOST, port=config.REDIS_PORT, decode_responses=True) 
+r = redis.Redis(connection_pool=pool)
 
 # 筛选数据，并返回
 def query_data(form_dict):
@@ -29,7 +34,7 @@ def query_data(form_dict):
             select_lst.remove(col)
         
         # where 部分
-        if query[0] == 'i':
+        if query[0].lower() == 'i':
             new_query = [f'"{query_col}"' for query_col in query[2:].replace('，',',').split(',')]
             where_str = where_str + col + ' IN (' + \
                  ','.join(new_query) + ')' + 'AND '
@@ -37,7 +42,7 @@ def query_data(form_dict):
             new_query = f'''{query[0].replace('！','!').replace('!','!=')} "{query[1:]}"'''
             where_str = where_str + col + new_query + 'AND '
         else:
-            if query == ' ':
+            if query in [' ','X','x']:
                 pass
             else:
                 raise Exception('输入有误。')
@@ -52,6 +57,21 @@ def query_data(form_dict):
         query_str = f'SELECT {select_str} FROM gaokao.{table_name}'
     result = pd.read_sql(query_str,con=con)
 
+
+    # 保存筛选后的数据
+    # 保存json版本，提供排序用
+    result_js = result.drop('id',axis=1)
+    total = result_js.shape[0]
+    rows = result_js.to_dict(orient='records')
+    result_js = {'total':total,'rows':rows}
+
+    with open('docs/queried_data.json','w',encoding='utf-8') as f:
+        f.write(json.dumps(result_js))
+
+    # 更改中文列名，提供下载用
+    result_ch = result.rename(columns=lambda x: c_c_dict[x])
+    result_ch.to_excel('./docs/queried_data.xlsx',index=False,encoding='utf-8')
+
     return result
 
 # 修改/删除数据
@@ -61,6 +81,11 @@ def edit_data(table_name,form_data,delete_ids):
     select_lst = list(c_c_dict.keys())
     
     # 删除数据
+    
+    # 删除new的部分
+    new_delete_ids = [x.split('&')[0] for x in delete_ids if 'new' in x]
+    delete_ids = [x for x in delete_ids if 'new' not in x]
+
     if delete_ids:
         for delete_id in delete_ids:
             delete_str = f'DELETE FROM gaokao.{table_name} WHERE (id = {delete_id});' 
@@ -70,9 +95,14 @@ def edit_data(table_name,form_data,delete_ids):
         print('删除成功')
 
     # 新旧数据
+    # 去除select条目
+    form_data = {key:value for key,value in form_data.items() if 'select' not in key}
+    
+    # 去除被select选中的条目
     new = [x for x in list(form_data.keys())[1:] if 'new' in x]
     old = [x for x in list(form_data.keys())[1:] if x not in new ]
     new = sorted(list(set([x.split('&')[0] for x in new])))
+    new = [x for x in new if x not in new_delete_ids]
     old = sorted(list(set([x.split('&')[0] for x in old])))
 
     # 修改一条旧数据

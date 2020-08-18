@@ -14,6 +14,19 @@
             "luqu_num": "录取数",
             "year": "年份",
             "location": "省份"
+        },
+        "dtype_dict": {
+            "id": "int",
+            "name": "str",
+            "category": "str",
+            "batch": "str",
+            "province_score": "int",
+            "bkcc": "str",
+            "low_score": "int",
+            "low_wc": "int",
+            "luqu_num": "int",
+            "year": "str",
+            "location": "str"
         }
     },
     "shaanxi_gaokao": {

@@ -1,12 +1,12 @@
 {% extends "crud.html" %} {% block crud_result %}
 <form action="/crud_edit" method="POST" name="idiot" enctype=multipart/form-data>
-    <table id="events" class="table table-hover">
+    <table id="events" class="table table-hover" data-toggle="table" data-search="true" data-height="500">
         <!-- <table class="table table-hover" id="example"> -->
         <thead>
             <tr>
-                <th width="40px">标记删除</th>
+                <th>标记删除</th>
                 {% for col in result_data.columns.tolist()[1:] %}
-                <th>
+                <th data-sortable="true">
                     {{database_info[table_name]['c_c_dict'][col]}}
                 </th>
                 {% endfor %}
@@ -19,20 +19,38 @@
                 <td><span><input type='checkbox' name='select' id='select' value={{result_data.loc[i,'id']}}></span></td>
 
                 {% for col in result_data.columns.tolist()[1:] %}
-                <td><input id="{{result_data.loc[i,'id']}}&{{col}}" name="{{result_data.loc[i,'id']}}&{{col}}" value="{{result_data.loc[i,col]}}"></td>
+                <td><input id={{result_data.loc[i,col]}} name="{{result_data.loc[i,'id']}}&{{col}}" value="{{result_data.loc[i,col]}}"></td>
                 {% endfor %}
             </tr>
             {% endfor %}
         </tbody>
     </table>
 
-    <button id="addRow" type="button" class="btn btn-primary">添加一行</button>
-    <button onclick="edit()" type="button" class="btn btn-primary">提交修改</button>
+    <button id="addRow" type="button" class="btn btn-primary mt-5">添加一行</button>
+    <button onclick="confirm_change()" type="button" class="btn btn-primary mt-5">提交修改</button>
+    <button onclick="download_file()" type="button" class="btn btn-primary mt-5">点击下载</button>
 
 </form>
 {% block crud_edit %} {% endblock %}
 
 <script type=text/javascript>
+    // 点击确认
+    function confirm_change() {
+        var msg = "修改和删除后数据将不可恢复，请检查并确认修改&删除条目，\n\n无误请点确定。";
+        if (confirm(msg) == true) {
+            return edit();
+        } else {
+            return false;
+        }
+    }
+
+    // 跳转下载
+    function download_file() {
+        document.idiot.action = "/download";
+        document.idiot.submit();
+    }
+
+    // 跳转编辑
     function edit() {　　　　　
         document.idiot.action = "/crud_edit";
         document.idiot.submit();
@@ -40,32 +58,9 @@
 
     $(function() {
 
-
-        //更新操作，input change事件，注册为document（也可以注册为table的事件）的事件是防止表格不存在，因为因为表格是动态生成的
+        //更新操作，标记背景色
         $('#event-info').on('change', "td>input", function() {
             $(this).css("background-color", "#FFFFCC");
-            id = $(this).attr('id');
-            var value = document.getElementById(id).value;
-            //alert(id+value);
-            $("#update_info").val(id + '&' + value); //为修改信息输入框赋值，以便后续翻页时取得该值
-            $("#del_info").val('none');
-            $("#add_info").val('none');
-            current_page = $('#current_page').val();
-            //alert(current_page);
-            show(current_page);
-        });
-
-        //点击删除
-        $(document).on('click', "tbody td>a", function() {
-            //$('td a').bind('click', function(){
-            id = $(this).attr('id'); //被删除数据的id
-            alert(id);
-            $("#del_info").val(id); //为删除信息输入框赋值
-            $("#update_info").val('none');
-            $("#add_info").val('none');
-            //alert($("#sort_info").val());
-            current_page = $('#current_page').val();
-            show(current_page);
         });
 
         //添加一行
@@ -73,54 +68,9 @@
             addRow();
         });
 
-        $(document).on('click', "#addSure", function() {
-            //$('td a').bind('click', function(){
-            itemid = $('input[name="addItemid"]').val();
-            sid = $('input[name="addSid"]').val();
-            expo_name = $('input[name="addExpoName"]').val();
-            start_date = $('input[name="addStartDate"]').val();
-            end_date = $('input[name="addEndDate"]').val();
-            city_name = $('input[name="addCityName"]').val();
-            unit_name = $('input[name="addUnitName"]').val();
-            unit_code = $('input[name="addUnitCode"]').val();
-            site = $('input[name="addSite"]').val();
-            exhibitor = $('input[name="addExhibitor"]').val();
-            visitor = $('input[name="addVisitor"]').val();
-            expo_area = $('input[name="addExpoArea"]').val();
-            get_date = $('input[name="addGetDate"]').val();
-            $("#add_info").val(itemid + '&' + sid + '&' + expo_name + '&' + unit_code + '&' + unit_name + '&' + city_name + '&' + start_date + '&' + end_date + '&' + site + '&' + exhibitor + '&' + visitor + '&' + expo_area + '&' + get_date); //为排序信息输入框赋值，以便后续翻页时取得该值
-            alert($("#add_info").val());
-            $("#update_info").val('none');
-            $("#del_info").val('none');
-            current_page = $('#current_page').val();
-            show(current_page);
-        });
-
-        //根据复选框状态进行删除
-        $('#mutiple_del').bind('click', function() {
-            var ids = "";
-            $('input[type="checkbox"][name="select"]:checked').each(function() {
-                ids = ids + "&" + $(this).val();
-                $(this).css("background-color", "#FFFFCC");
-            });
-            ids = ids.substring(1, ids.Length);
-            if (ids) {
-                alert(ids);
-                //$("#del_info").attr("value",ids);
-                $("#del_info").val(ids);
-                $("#update_info").val('none');
-                //$("#search_info").val();
-                current_page = $('#current_page').val();
-                show(current_page);
-            } else {
-                alert('请至少选择一项！');
-                return false;
-            }
-        });
-
         //选中行变色
         $('#event-info').on('change', "td>span>input", function() {
-            $(this).parent().parent().parent().toggleClass("tr_select");
+            $(this).parent().parent().parent().css("background-color", "#CC6200");
         });
 
         //添加一行
