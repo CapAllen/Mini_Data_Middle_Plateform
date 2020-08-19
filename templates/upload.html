@@ -1,0 +1,75 @@
+{% extends "homepage.html" %} {% block database_manager %}
+<h2 class="text-center mt-3 ">新建数据库</h2>
+<p class="text-muted"><strong>注意：提交的文件应该为标准的Excel表格</strong>
+    <li class="text-muted">每列都有列名，且彼此不重复</li>
+    <li class="text-muted">无多级行列标签</li>
+    <li class="text-muted">无合并单元格</li>
+</p>
+
+<form action="/crud_create" method="POST" enctype=multipart/form-data>
+    <div id="new_table">
+        <div class="form-group">
+            <input type="file" name="upload_file" class="form-control-file" accept=".xls,.xlsx" required>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <input type="text" name="db_name" class="form-control" placeholder="数据库名称，如：西安中考" required>
+            </div>
+            <div class="form-group col-md-6">
+                <input type="text" name="db_desc" class="form-control" placeholder="数据库介绍，如：2019年西安中考数据，包含xxx等。" required>
+            </div>
+        </div>
+        <!-- <div class="form-row">
+            <div class="form-group col-md-3">
+                <input type="text" name="col_1" class="form-control" placeholder="列名" required>
+            </div>
+            <div class="form-group col-md-3">
+                <select name="col_1_type" class="form-control">
+                <option selected>短文本(中文字符少于50)</option>
+                <option>长文本</option>
+                <option>整数</option>
+                <option>小数</option>
+              </select>
+            </div>
+            <div class="form-group col-md-3">
+                <input type="text" name="col_2" class="form-control" placeholder="列名">
+            </div>
+            <div class="form-group col-md-3">
+                <select name="col_2_type" class="form-control">
+                <option selected>短文本(中文字符少于50)</option>
+                <option>长文本</option>
+                <option>整数</option>
+                <option>小数</option>
+              </select>
+            </div>
+        </div> -->
+    </div>
+
+    <!-- <button id="addRow" type="button" class="btn btn-primary mt-5">添加列</button> -->
+    <button type="submit" class="btn btn-primary mt-5">提交</button>
+
+
+</form>
+<script type=text/javascript>
+    //添加一行
+    function addRow() {
+        var count = document.getElementsByClassName("form-group").length;
+        // .rows
+        // // 获取最后一行的id
+        var last_id = document.getElementsByClassName("form-group")[count - 1].children[0].name;
+        console.log(last_id);
+        col_num = parseInt(last_id.split('_')[1]) + 1;
+        var new_div = "<div class=\"form-row\"><div class=\"form-group col-md-3\"><input type=\"text\" name=\"col_" + col_num + "\" class=\"form-control\" placeholder=\"列名\"> </div> <div class=\"form-group col-md-3\"> <select name=col_" + col_num + "_type\" class=\"form-control\">                <option selected>短文本(中文字符少于50)</option>                <option>长文本</option>                <option>整数</option>                <option>小数</option>              </select>        </div>        <div class=\"form-group col-md-3\">            <input type=\"text\" name=\"col_" + (col_num + 1) + "\" class=\"form-control\" placeholder=\"列名\">        </div>        <div class=\"form-group col-md-3\">            <select name=\"col_" + (col_num + 1) + "_type\" class=\"form-control\">                <option selected>短文本(中文字符少于50)</option>                <option>长文本</option>                <option>整数</option>                <option>小数</option>              </select>        </div>"
+
+        $('#new_table').append(new_div);
+
+    };
+
+    $(function() {
+        //添加一行
+        $('#addRow').bind('click', function() {
+            addRow();
+        });
+    });
+</script>
+{% endblock %}
