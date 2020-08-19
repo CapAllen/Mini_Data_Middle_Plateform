@@ -12,22 +12,6 @@ from xpinyin import Pinyin
 # 初始化pinyin
 p = Pinyin()
 
-# 数据类型对照字典
-dtype_cc_dict = {
-    'for_json': {
-        '短文本(中文字符少于50)': 'str',
-        '长文本': 'str',
-        '整数': 'int',
-        '小数': 'float'
-    },
-    'for_sql': {
-        '短文本(中文字符少于50)': 'VARCHAR(100)',
-        '长文本': 'TEXT(1000)',
-        '整数': 'INT',
-        '小数': 'FLOAT'
-    }
-}
-
 # read database info
 with open('docs/database_info.json', encoding='utf-8') as f:
     database_info = json.load(f)
@@ -49,15 +33,17 @@ def format_string(x):
     # 提取中文
     ch_part = re.findall(r"[\u4e00-\u9fa5]+", x)
     ch_part = '_'.join(ch_part)
-    # 转成拼音
-    ch_part = p.get_pinyin(ch_part, '_').replace('___', '_')
-    # 提取首字母
-    ch_part = ''.join([py[0] for py in ch_part.split('_')])
+    if ch_part:
+        # 转成拼音
+        ch_part = p.get_pinyin(ch_part, '_').replace('___', '_')
+        # 提取首字母
+        ch_part = ''.join([py[0] for py in ch_part.split('_')])
     # 拼接非中文字符
     en_part = re.findall(r"[a-zA-Z0-9]+", x)
     en_part = ''.join(en_part)
 
-    result = en_part + '_' + ch_part if en_part else ch_part
+    
+    result = en_part + '_' + ch_part if en_part and ch_part else (ch_part if ch_part else en_part)
     return result
 
 # 重名检测
@@ -113,20 +99,29 @@ def query_data(form_dict):
         query_str = f'SELECT {select_str} FROM gaokao.{table_name}'
     result = pd.read_sql(query_str, con=con)
 
-    # 保存筛选后的数据
-    # 保存json版本，提供排序用
-    result_js = result.drop('id', axis=1)
-    total = result_js.shape[0]
-    rows = result_js.to_dict(orient='records')
-    result_js = {'total': total, 'rows': rows}
-
-    with open('docs/queried_data.json', 'w', encoding='utf-8') as f:
-        f.write(json.dumps(result_js))
 
     # 更改中文列名，提供下载用
     result_ch = result.rename(columns=lambda x: c_c_dict[x])
     result_ch.to_excel('./docs/queried_data.xlsx',
                        index=False, encoding='utf-8')
+
+    # 构造排序列
+    for col in result.columns[1:]:
+        if result[col].dtype == 'O':
+            result[f'{col}_sort'] = result[col]
+        else:
+            max_len = result[col].astype(str).apply(lambda x:len(x)).max()
+            result[f'{col}_sort'] = result[col].astype(str).str.zfill(max_len)
+
+    # 保存筛选后的数据
+    # 保存json版本，提供排序用
+    # result_js = result.drop('id', axis=1)
+    # total = result_js.shape[0]
+    # rows = result_js.to_dict(orient='records')
+    # result_js = {'total': total, 'rows': rows}
+
+    # with open('docs/queried_data.json', 'w', encoding='utf-8') as f:
+    #     f.write(json.dumps(result_js))    
 
     return result
 
@@ -206,67 +201,57 @@ def edit_data(table_name, form_dict, delete_ids):
 # 创建新数据库
 def create_data(form_dict):
 
+    # 读取上传的文件
+    filename = [file for file in os.listdir('docs/') if 'upload_file' in file][0]
+    new_df = pd.read_excel(os.path.join('docs/',filename))
+    
+    new_df = new_df.rename(columns={'id':'ID'})
+    # 给new_df 创建自增id列
+    new_df = new_df.reset_index(drop=True).reset_index().rename(columns={'index':'id'})
+    data_amount = new_df.shape[0]
+
     # 提取列名和类型
-    idx = 0
-    col_names = []
-    col_dtypes = []
-    for key in form_dict.keys():
-        if ('col' in key) and (idx % 2 == 0):
-            col_names.append(form_dict[key])
-        elif ('col' in key) and (idx % 2 == 1):
-            col_dtypes.append(form_dict[key])
-        else:
-            continue
-        idx += 1
-
-    # 删除空的列名
-    col_names = [col for col in col_names if col.strip()]
-
-    # 构建中英文对照字典
-    c_c_dict = {'id': 'id'}
+    col_names = new_df.columns.tolist()
+    c_c_dict = {}
     for col in col_names:
         col_en = format_string(col)
         # 防止重名
         col_en = chongming(col_en,c_c_dict)
         c_c_dict[col_en] = col
+
     reverse_c_c_dict = {value: key for key, value in c_c_dict.items()}
+    # 重命名df
+    new_df = new_df.rename(columns=lambda x:reverse_c_c_dict[x])
 
-    # 构建数据类型字典
-    dtype_dict = {reverse_c_c_dict[col]: dtype_cc_dict['for_json']
-                  [col_dtypes[col_names.index(col)]] for col in col_names}
-    dtype_dict.update({'id': 'int'})
-
-    # 构建并更新到database_info.json中
+    def format_dtypes(x):
+        if 'int' in x:
+            return 'int'
+        elif 'float' in x:
+            return 'float'
+        else:
+            return 'str'
+    # 检测数据类型
+    dtype_dict = dict(new_df.dtypes.astype(str).apply(format_dtypes))
     db_en = format_string(form_dict['db_name'])
     # 防止重名
     db_en = chongming(db_en,database_info)
-
-    new_db_dict = {db_en: {
-        "in_chinese": form_dict['db_name'],
-        "desc": form_dict['db_desc'],
-        "c_c_dict": c_c_dict,
-        "dtype_dict": dtype_dict
-    }}
-    
-    database_info.update(new_db_dict)
-    with open('docs/database_info.json','w',encoding='utf-8') as f:
-        f.write(json.dumps(database_info,ensure_ascii=False))
-
-    # 写入数据库
-    # 读取上传的文件
-    filename = [file for file in os.listdir('docs/') if 'upload_file' in file][0]
-    new_df = pd.read_excel(os.path.join('docs/',filename))
-
-    # 给new_df 创建自增id列
-    new_df = new_df.reset_index(drop=True).reset_index().rename(columns={'index':'id'})
-    data_amount = new_df.shape[0]
-    new_df.columns = list(c_c_dict.keys())
     # 新建数据表
     create_str = f'CREATE TABLE {db_en} (id INT NOT NULL,'
-    for col_name in col_names:
-        create_str += f"{reverse_c_c_dict[col_name]} {dtype_cc_dict['for_sql'][col_dtypes[col_names.index(col_name)]]} NULL,"
+    for col_name in new_df.columns.tolist()[1:]:
+        # 判断数据类型
+        col_dtype = dtype_dict[col_name]
+        if col_dtype in ['int','float']:
+            col_dtype = col_dtype.upper()
+        else:
+            max_len = new_df[col].apply(lambda x:len(str(x))).max()
+            if max_len*2 < 1000:
+                col_dtype = f'VARCHAR({max_len*2})'
+            else:
+                col_dtype = f'TEXT({max_len*2})'
+        create_str += f"{col_name} {col_dtype} NULL,"
 
     create_str += 'PRIMARY KEY (id));'
+    print(create_str)
     cursor = con.cursor()
     cursor.execute(create_str)
     # 导入数据
@@ -279,6 +264,20 @@ def create_data(form_dict):
         cursor.execute(insert_str)
 
     con.commit()
+
+    # 构建并更新到database_info.json中
+    
+
+    new_db_dict = {db_en: {
+        "in_chinese": form_dict['db_name'],
+        "desc": form_dict['db_desc'],
+        "c_c_dict": c_c_dict,
+        "dtype_dict": dtype_dict
+    }}
+    
+    database_info.update(new_db_dict)
+    with open('docs/database_info.json','w',encoding='utf-8') as f:
+        f.write(json.dumps(database_info,ensure_ascii=False))
 
     
 

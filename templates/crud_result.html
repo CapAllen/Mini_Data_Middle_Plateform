@@ -5,11 +5,11 @@
         <thead>
             <tr>
                 <th>标记删除</th>
-                {% for col in result_data.columns.tolist()[1:] %}
+                {% for col in result_data.columns.tolist()[1:] %} {% if 'sort' not in col %}
                 <th data-sortable="true">
                     {{database_info[table_name]['c_c_dict'][col]}}
                 </th>
-                {% endfor %}
+                {% endif %} {% endfor %}
             </tr>
         </thead>
 
@@ -18,9 +18,9 @@
             <tr>
                 <td><span><input type='checkbox' name='select' id='select' value={{result_data.loc[i,'id']}}></span></td>
 
-                {% for col in result_data.columns.tolist()[1:] %}
-                <td><input id="{{result_data.loc[i,'id']}}&{{col}}" name="{{result_data.loc[i,'id']}}&{{col}}" value="{{result_data.loc[i,col]}}"></td>
-                {% endfor %}
+                {% for col in result_data.columns.tolist()[1:] %} {% if 'sort' not in col %}
+                <td><input id="{{result_data.loc[i,col+'_sort']}}" name="{{result_data.loc[i,'id']}}&{{col}}" value="{{result_data.loc[i,col]}}"></td>
+                {% endif %} {% endfor %}
             </tr>
             {% endfor %}
         </tbody>

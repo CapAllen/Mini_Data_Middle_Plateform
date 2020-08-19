@@ -125,8 +125,14 @@ def go_crud_create():
 
     edit_dict = request.form
     create_data(edit_dict)
+    
+    tables = pd.read_sql('show tables', con=con)['Tables_in_gaokao']
 
-    return render_template('crud_create.html')
+    return render_template(
+        'crud_create.html',
+        tables=tables,
+        database_info=database_info)
+
 
 @app.route('/help', methods=['GET', 'POST'])
 def go_help():
