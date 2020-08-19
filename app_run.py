@@ -111,7 +111,6 @@ def download_file():
 
 @app.route("/upload")
 def go_upload():
-    
     return render_template('upload.html')
 
 
@@ -125,9 +124,9 @@ def go_crud_create():
     print('save.')
 
     edit_dict = request.form
-    print(edit_dict)
+    create_data(edit_dict)
 
-    return None
+    return render_template('crud_create.html')
 
 @app.route('/help', methods=['GET', 'POST'])
 def go_help():

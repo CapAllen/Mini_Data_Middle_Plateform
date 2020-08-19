@@ -22,7 +22,7 @@ dtype_cc_dict = {
     },
     'for_sql': {
         '短文本(中文字符少于50)': 'VARCHAR(100)',
-        '长文本': 'TEXT',
+        '长文本': 'TEXT(1000)',
         '整数': 'INT',
         '小数': 'FLOAT'
     }
@@ -210,11 +210,11 @@ def create_data(form_dict):
     idx = 0
     col_names = []
     col_dtypes = []
-    for key in upload_dict.keys():
+    for key in form_dict.keys():
         if ('col' in key) and (idx % 2 == 0):
-            col_names.append(upload_dict[key])
+            col_names.append(form_dict[key])
         elif ('col' in key) and (idx % 2 == 1):
-            col_dtypes.append(upload_dict[key])
+            col_dtypes.append(form_dict[key])
         else:
             continue
         idx += 1
@@ -237,13 +237,13 @@ def create_data(form_dict):
     dtype_dict.update({'id': 'int'})
 
     # 构建并更新到database_info.json中
-    db_en = format_string(upload_dict['db_name'])
+    db_en = format_string(form_dict['db_name'])
     # 防止重名
     db_en = chongming(db_en,database_info)
 
     new_db_dict = {db_en: {
-        "in_chinese": upload_dict['db_name'],
-        "desc": upload_dict['db_desc'],
+        "in_chinese": form_dict['db_name'],
+        "desc": form_dict['db_desc'],
         "c_c_dict": c_c_dict,
         "dtype_dict": dtype_dict
     }}
@@ -253,8 +253,37 @@ def create_data(form_dict):
         f.write(json.dumps(database_info,ensure_ascii=False))
 
     # 写入数据库
+    # 读取上传的文件
+    filename = [file for file in os.listdir('docs/') if 'upload_file' in file][0]
+    new_df = pd.read_excel(os.path.join('docs/',filename))
 
-    new_df = pd.read_excel('docs/upload_file.*')
+    # 给new_df 创建自增id列
+    new_df = new_df.reset_index(drop=True).reset_index().rename(columns={'index':'id'})
+    data_amount = new_df.shape[0]
+    new_df.columns = list(c_c_dict.keys())
+    # 新建数据表
+    create_str = f'CREATE TABLE {db_en} (id INT NOT NULL,'
+    for col_name in col_names:
+        create_str += f"{reverse_c_c_dict[col_name]} {dtype_cc_dict['for_sql'][col_dtypes[col_names.index(col_name)]]} NULL,"
+
+    create_str += 'PRIMARY KEY (id));'
+    cursor = con.cursor()
+    cursor.execute(create_str)
+    # 导入数据
+    for i in new_df.index:
+        value_str = ''
+        for col in new_df.columns:
+            value_str += f'{eval(dtype_dict[col])(new_df.loc[i,col])},'
+            
+        insert_str = f"INSERT INTO {db_en} VALUES ({value_str[:-1]});"
+        cursor.execute(insert_str)
+
+    con.commit()
+
+    
+
+
+
 
     
  
