@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-
+import os
 from database import *
 from flask import Flask, request, render_template, jsonify, json, redirect, url_for
 from flask import send_file, send_from_directory, make_response
-
+from werkzeug import secure_filename
 app = Flask(__name__)
 
 
@@ -108,6 +108,26 @@ def download_file():
     response = make_response(send_from_directory('./docs/', filename,as_attachment=True))
     response.headers["Content-Disposition"] = "attachment; filename={}".format(filename.encode().decode('latin-1'))
     return response
+
+@app.route("/upload")
+def go_upload():
+    
+    return render_template('upload.html')
+
+
+@app.route("/crud_create",  methods=['POST'])
+def go_crud_create():
+
+    upload_file = request.files.get('upload_file')
+    filename = 'upload_file' + '.' + upload_file.filename.split('.')[-1]  # 获取文件名
+    filelocation = os.path.join('docs/',filename)
+    upload_file.save(filelocation) # 保存文件
+    print('save.')
+
+    edit_dict = request.form
+    print(edit_dict)
+
+    return None
 
 @app.route('/help', methods=['GET', 'POST'])
 def go_help():
