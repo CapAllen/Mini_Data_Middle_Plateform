@@ -25,7 +25,9 @@ con = pymysql.connect(
 
 # connect redis
 pool = redis.ConnectionPool(host=config.REDIS_HOST,
-                            port=config.REDIS_PORT, decode_responses=True)
+                            port=config.REDIS_PORT, 
+                            password=config.REDIS_PW,
+                            decode_responses=True)
 r = redis.Redis(connection_pool=pool)
 
 # 提取中文，转换拼音，拼接返回
@@ -97,21 +99,26 @@ def query_data(form_dict):
         query_str = f'SELECT {select_str} FROM gaokao.{table_name} WHERE {where_str}'
     else:
         query_str = f'SELECT {select_str} FROM gaokao.{table_name}'
+    print(query_str)
     result = pd.read_sql(query_str, con=con)
 
+    if result.shape[0]>0:
 
-    # 更改中文列名，提供下载用
-    result_ch = result.rename(columns=lambda x: c_c_dict[x])
-    result_ch.to_excel('./docs/queried_data.xlsx',
-                       index=False, encoding='utf-8')
+        # 更改中文列名，提供下载用
+        result_ch = result.rename(columns=lambda x: c_c_dict[x])
+        result_ch.drop('id',axis=1).to_excel('./docs/queried_data.xlsx',
+                        index=False, encoding='utf-8')
 
-    # 构造排序列
-    for col in result.columns[1:]:
-        if result[col].dtype == 'O':
-            result[f'{col}_sort'] = result[col]
-        else:
-            max_len = result[col].astype(str).apply(lambda x:len(x)).max()
-            result[f'{col}_sort'] = result[col].astype(str).str.zfill(max_len)
+    
+        for col in result.columns[1:]:
+            # str类型：英文不变，数字不变，中文转为首字符拼音
+            if result[col].dtype == 'O':
+                result[f'{col}_sort'] = result[col].apply(format_string)
+                max_len = result[f'{col}_sort'].astype(str).apply(lambda x:len(x)).max()
+                result[f'{col}_sort'] = result[f'{col}_sort'].astype(str).str.ljust(max_len,'0')
+            else:
+                max_len = result[col].astype(str).apply(lambda x:len(x)).max()
+                result[f'{col}_sort'] = result[col].astype(str).str.zfill(max_len)
 
     # 保存筛选后的数据
     # 保存json版本，提供排序用
