@@ -2,7 +2,7 @@
 <h2 class="text-center mt-3 ">{{table_name_ch}}</h2>
 
 
-<form action="/crud_result" method="POST" enctype=multipart/form-data>
+<form action="/crud_result" method="POST" name="crud_query" enctype=multipart/form-data>
 
     <div class="form-row">
         <input name="db_name" type="hidden" value={{table_name}}> {% for eng, ch in cc_lst %}
@@ -13,7 +13,20 @@
 
     </div>
 
-    <button id="search" type="submit" class="btn btn-primary mt-2 mb-2">提交</button>
+    <button onclick="get_result()" type="button" class="btn btn-primary mt-2 mb-2">查看数据</button>
+    <button onclick="direct_download_file()" type="button" class="btn btn-primary mt-2 mb-2">直接下载</button>
 </form>
 
+<script type=text/javascript>
+    // 跳转显示结果
+    function get_result() {
+        document.crud_query.action = "/crud_result";
+        document.crud_query.submit();
+    }
+    // 跳转直接下载
+    function direct_download_file() {
+        document.crud_query.action = "/direct_download";
+        document.crud_query.submit();
+    }
+</script>
 {% endblock %} {% block crud_result %} {% endblock %}

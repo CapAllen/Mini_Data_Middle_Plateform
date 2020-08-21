@@ -8,6 +8,7 @@
     <link href="{{ url_for('static', filename='css/bootstrap-table.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/colResizable.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/selfy.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/jquery-ui.css') }}" rel="stylesheet">
 
 
     <script src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
@@ -16,6 +17,7 @@
     <script src="{{url_for('static', filename='js/colResizable-1.5.min.js')}}"></script>
     <script src="{{url_for('static', filename='js/bootstrap-table.js')}}"></script>
     <script src="{{url_for('static', filename='js/bootstrap-table-zh-CN.js')}}"></script>
+    <script src="{{url_for('static', filename='js/jquery-ui.js')}}"></script>
 
 
 </head>
@@ -58,7 +60,44 @@
     </nav>
 
     <div class="container">
-        {% block database_manager %} {% endblock %}
+        {% block database_manager %}
+        <h3 class="mt-5">官方新闻----------------------------------------------------------------------------------------</h3>
+        <div class="row mt-3">
+            {% for site_name,site_item in official_news.items() %}
+            <div class="col">
+                <div class="card">
+                    <h5 class="card-header"><img src="{{site_item['favicon']}}" width="25"><a href="{{site_item['homepage']}}" class='ml-1'>{{site_name}}</a></h5>
+                    <div class="card-body" style="height:370px; overflow-y: scroll">
+                        {% for part_name,part_lst in site_item['result'].items() %}
+                        <p><button type="button" class="btn btn-outline-dark btn-sm mt-2" disabled>{{part_name}}</button></p>
+                        {% for part_item in part_lst %}
+                        <h6 id="list-item-1" style="text-align:left"><a href="{{part_item['article_url']}}">{{'-'.join(part_item['post_date'].split('-')[1:])}}：{{part_item['title']}}</a></h6>
+                        {% endfor %} {% endfor %}
+
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <h3 class="mt-5">门户新闻----------------------------------------------------------------------------------------</h3>
+        <div class="row mt-3">
+            {% for site_name,site_item in menhu_news.items() %}
+            <div class="col">
+                <div class="card">
+                    <h5 class="card-header"><img src="{{site_item['favicon']}}" width="25"><a href="{{site_item['homepage']}}" class='ml-1'>{{site_name}}</a></h5>
+                    <div class="card-body" style="height:370px; overflow-y: scroll">
+                        {% for part_name,part_lst in site_item['result'].items() %}
+                        <p><button type="button" class="btn btn-outline-dark btn-sm mt-2" disabled>{{part_name}}</button></p>
+                        {% for part_item in part_lst %}
+                        <h6 id="list-item-1" style="text-align:left"><a href="{{part_item['article_url']}}">{{'-'.join(part_item['post_date'].split('-')[1:])}}：{{part_item['title']}}</a></h6>
+                        {% endfor %} {% endfor %}
+
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endblock %}
     </div>
     {% block crud_result %} {% endblock %}
 
