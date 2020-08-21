@@ -1,4 +1,6 @@
 
+# coding=utf-8
+
 import os
 import re
 import json
@@ -16,16 +18,13 @@ p = Pinyin()
 with open('docs/database_info.json', encoding='utf-8') as f:
     database_info = json.load(f)
 
-# connect mysql
-con = pymysql.connect(
-    host=config.HOST,
-    user=config.USER,
-    password=config.PW,
-    database=config.DB)
+
 
 # connect redis
 pool = redis.ConnectionPool(host=config.REDIS_HOST,
-                            port=config.REDIS_PORT, decode_responses=True)
+                            port=config.REDIS_PORT, 
+                            password=config.REDIS_PW,
+                            decode_responses=True)
 r = redis.Redis(connection_pool=pool)
 
 # 提取中文，转换拼音，拼接返回
@@ -64,6 +63,13 @@ def chongming(x,dc,n=1):
 # 筛选数据，并返回
 def query_data(form_dict):
 
+    # connect mysql
+    con = pymysql.connect(
+        host=config.HOST,
+        user=config.USER,
+        password=config.PW,
+        database=config.DB)
+
     table_name = form_dict['db_name']
     c_c_dict = database_info[table_name]['c_c_dict']
     select_lst = list(c_c_dict.keys())
@@ -97,21 +103,26 @@ def query_data(form_dict):
         query_str = f'SELECT {select_str} FROM gaokao.{table_name} WHERE {where_str}'
     else:
         query_str = f'SELECT {select_str} FROM gaokao.{table_name}'
+    print(query_str)
     result = pd.read_sql(query_str, con=con)
 
+    if result.shape[0]>0:
 
-    # 更改中文列名，提供下载用
-    result_ch = result.rename(columns=lambda x: c_c_dict[x])
-    result_ch.to_excel('./docs/queried_data.xlsx',
-                       index=False, encoding='utf-8')
+        # 更改中文列名，提供下载用
+        result_ch = result.rename(columns=lambda x: c_c_dict[x])
+        result_ch.drop('id',axis=1).to_excel('./docs/queried_data.xlsx',
+                        index=False, encoding='utf-8')
 
-    # 构造排序列
-    for col in result.columns[1:]:
-        if result[col].dtype == 'O':
-            result[f'{col}_sort'] = result[col]
-        else:
-            max_len = result[col].astype(str).apply(lambda x:len(x)).max()
-            result[f'{col}_sort'] = result[col].astype(str).str.zfill(max_len)
+    
+        for col in result.columns[1:]:
+            # str类型：英文不变，数字不变，中文转为首字符拼音
+            if result[col].dtype == 'O':
+                result[f'{col}_sort'] = result[col].apply(format_string)
+                max_len = result[f'{col}_sort'].astype(str).apply(lambda x:len(x)).max()
+                result[f'{col}_sort'] = result[f'{col}_sort'].astype(str).str.ljust(max_len,'0')
+            else:
+                max_len = result[col].astype(str).apply(lambda x:len(x)).max()
+                result[f'{col}_sort'] = result[col].astype(str).str.zfill(max_len)
 
     # 保存筛选后的数据
     # 保存json版本，提供排序用
@@ -122,11 +133,18 @@ def query_data(form_dict):
 
     # with open('docs/queried_data.json', 'w', encoding='utf-8') as f:
     #     f.write(json.dumps(result_js))    
-
+    con.close()
     return result
 
 # 修改/删除数据
 def edit_data(table_name, form_dict, delete_ids):
+
+    # connect mysql
+    con = pymysql.connect(
+        host=config.HOST,
+        user=config.USER,
+        password=config.PW,
+        database=config.DB)
 
     c_c_dict = database_info[table_name]['c_c_dict']
     select_lst = list(c_c_dict.keys())
@@ -196,11 +214,17 @@ def edit_data(table_name, form_dict, delete_ids):
         cursor.execute(replace_str)
         con.commit()
         print('新数据处理完成')
-
+    con.close()
 
 # 创建新数据库
 def create_data(form_dict):
 
+    # connect mysql
+    con = pymysql.connect(
+        host=config.HOST,
+        user=config.USER,
+        password=config.PW,
+        database=config.DB)
     # 读取上传的文件
     filename = [file for file in os.listdir('docs/') if 'upload_file' in file][0]
     new_df = pd.read_excel(os.path.join('docs/',filename))
@@ -222,7 +246,15 @@ def create_data(form_dict):
     reverse_c_c_dict = {value: key for key, value in c_c_dict.items()}
     # 重命名df
     new_df = new_df.rename(columns=lambda x:reverse_c_c_dict[x])
+    
+    # 纠正数据类型
+    for col in new_df.columns:
+        try:
+            new_df[col] = new_df[col].astype(float)
+        except:
+            continue
 
+    
     def format_dtypes(x):
         if 'int' in x:
             return 'int'
@@ -232,10 +264,24 @@ def create_data(form_dict):
             return 'str'
     # 检测数据类型
     dtype_dict = dict(new_df.dtypes.astype(str).apply(format_dtypes))
+
+    # 缺失值填充：将数值型填充为-1，字符型填充为-
+    # new_df
+    for col,dtype in dtype_dict.items():
+        if dtype in ['int','float']:
+            new_df[col] = new_df[col].fillna(-1)
+            # 判断是否有小数
+            xiaoshu_sum = new_df[col].astype(str).str.split('.').str[-1].astype(int).sum()
+            if xiaoshu_sum == 0:
+                new_df[col] = new_df[col].astype(int)
+                dtype_dict[col] = 'int'
+        else:
+            new_df[col] = new_df[col].fillna('-')
+
     db_en = format_string(form_dict['db_name'])
     # 防止重名
     db_en = chongming(db_en,database_info)
-    # 新建数据表
+    # 新建数据表    
     create_str = f'CREATE TABLE {db_en} (id INT NOT NULL,'
     for col_name in new_df.columns.tolist()[1:]:
         # 判断数据类型
@@ -243,11 +289,11 @@ def create_data(form_dict):
         if col_dtype in ['int','float']:
             col_dtype = col_dtype.upper()
         else:
-            max_len = new_df[col].apply(lambda x:len(str(x))).max()
-            if max_len*2 < 1000:
-                col_dtype = f'VARCHAR({max_len*2})'
+            max_len = new_df[col_name].apply(lambda x:len(str(x))).max()
+            if max_len*4 < 1000:
+                col_dtype = f'VARCHAR({max_len*4})'
             else:
-                col_dtype = f'TEXT({max_len*2})'
+                col_dtype = f'TEXT({max_len*4})'
         create_str += f"{col_name} {col_dtype} NULL,"
 
     create_str += 'PRIMARY KEY (id));'
@@ -258,10 +304,14 @@ def create_data(form_dict):
     for i in new_df.index:
         value_str = ''
         for col in new_df.columns:
-            value_str += f'{eval(dtype_dict[col])(new_df.loc[i,col])},'
+            value_str += f'"{eval(dtype_dict[col])(new_df.loc[i,col])}",'
             
         insert_str = f"INSERT INTO {db_en} VALUES ({value_str[:-1]});"
-        cursor.execute(insert_str)
+
+        try:
+            cursor.execute(insert_str)
+        except:
+            print(insert_str)
 
     con.commit()
 
@@ -278,6 +328,8 @@ def create_data(form_dict):
     database_info.update(new_db_dict)
     with open('docs/database_info.json','w',encoding='utf-8') as f:
         f.write(json.dumps(database_info,ensure_ascii=False))
+    
+    con.close()
 
     
 
