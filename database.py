@@ -19,7 +19,6 @@ with open('docs/database_info.json', encoding='utf-8') as f:
     database_info = json.load(f)
 
 
-
 # connect redis
 pool = redis.ConnectionPool(host=config.REDIS_HOST,
                             port=config.REDIS_PORT, 
