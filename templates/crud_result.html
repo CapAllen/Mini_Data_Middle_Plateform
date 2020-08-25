@@ -1,31 +1,31 @@
 {% extends "crud.html" %} {% block crud_result %}
 <form action="/crud_edit" method="POST" name="idiot" enctype=multipart/form-data>
     <div class="table-responsive">
-    <table id="events" class="table table-hover table-striped" data-toggle="table" data-search="true" data-height="500" data-width="200" style="table-layout:fixed;word-break:break-all;word-wrap:break-all;">
+        <table id="events" class="table table-hover table-striped" data-toggle="table" data-search="true" data-height="500" data-width="200" style="table-layout:fixed;word-break:break-all;word-wrap:break-all;">
 
-        <thead>
-            <tr>
-                <th>标记删除</th>
-                {% for col in result_data.columns.tolist()[1:] %} {% if 'sort' not in col %}
-                <th data-sortable="true" title="{{database_info[table_name]['c_c_dict'][col]}}">
-                    {{database_info[table_name]['c_c_dict'][col]}}
-                </th>
-                {% endif %} {% endfor %}
-            </tr>
-        </thead>
+            <thead>
+                <tr>
+                    <th>标记删除</th>
+                    {% for col in result_data.columns.tolist()[1:] %} {% if 'sort' not in col %}
+                    <th data-sortable="true" title="{{database_info[table_name]['c_c_dict'][col]}}">
+                        {{database_info[table_name]['c_c_dict'][col]}}
+                    </th>
+                    {% endif %} {% endfor %}
+                </tr>
+            </thead>
 
-        <tbody id="event-info">
-            {% for i in result_data.index %}
-            <tr>
-                <td><span><input type='checkbox' name='select' id='select' value={{result_data.loc[i,'id']}}></span></td>
+            <tbody id="event-info">
+                {% for i in result_data.index %}
+                <tr>
+                    <td><span><input type='checkbox' name='select' id='select' value={{result_data.loc[i,'id']}}></span></td>
 
-                {% for col in result_data.columns.tolist()[1:] %} {% if 'sort' not in col %}
-                <td><input id="{{result_data.loc[i,col+'_sort']}}" name="{{result_data.loc[i,'id']}}&{{col}}" value="{{result_data.loc[i,col]}}" title="{{result_data.loc[i,col]}}"></td>
-                {% endif %} {% endfor %}
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                    {% for col in result_data.columns.tolist()[1:] %} {% if 'sort' not in col %}
+                    <td><input id="{{result_data.loc[i,col+'_sort']}}" name="{{result_data.loc[i,'id']}}&{{col}}" value="{{result_data.loc[i,col]}}" title="{{result_data.loc[i,col]}}"></td>
+                    {% endif %} {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
     <button id="addRow" type="button" class="btn btn-primary mt-5">添加一行</button>
@@ -48,7 +48,7 @@
 
     // 跳转下载
     function download_file() {
-        document.idiot.action = "/download";
+        document.idiot.action = "/download/queried_data.xlsx";
         document.idiot.submit();
     }
 
@@ -117,7 +117,7 @@
     //             if ( typeof(text) != "undefined" ){
     //                 if (text.length > 0){
     //             console.log(text);}}
-            
+
     //     });
     // })
 </script>
