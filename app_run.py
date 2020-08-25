@@ -1,11 +1,28 @@
 # -*- coding: utf-8 -*-
 import os
+import zipfile
 from database import *
+from scrap_funcs import *
 from flask import Flask, request, render_template, jsonify, json, redirect, url_for
 from flask import send_file, send_from_directory, make_response
 from werkzeug import secure_filename
 app = Flask(__name__)
 
+
+def zip_dir(dirname, zipfilename):
+    filelist = []
+    if os.path.isfile(dirname):
+        filelist.append(dirname)
+    else :
+        for root, dirs, files in os.walk(dirname):
+            for name in files:
+                filelist.append(os.path.join(root, name))
+    zf = zipfile.ZipFile(zipfilename, "w", zipfile.zlib.DEFLATED)
+    for tar in filelist:
+        arcname = tar[len(dirname):]
+        #print arcname
+        zf.write(tar,arcname)
+    zf.close()
 
 @app.route('/')
 def homepage():
@@ -128,10 +145,15 @@ def direct_download_file():
     return response
 
 
-@app.route("/download",  methods=['GET', 'POST'])
-def download_file():
+@app.route("/download/<filename>",  methods=['GET', 'POST'])
+def download_file(filename):
 
-    filename = 'queried_data.xlsx'
+    if filename == 'xian_edu_tzgg.zip':
+        zip_dir('./docs/xian_edu','./docs/xian_edu_tzgg.zip')
+    elif filename == 'zhihu_user.zip':
+        zip_dir('./docs/zhihu','./docs/zhihu_user.zip')
+    else:
+        pass
     response = make_response(send_from_directory(
         './docs/', filename, as_attachment=True))
     response.headers["Content-Disposition"] = "attachment; filename={}".format(
@@ -173,6 +195,21 @@ def go_crud_create():
         tables=tables,
         database_info=database_info)
 
+@app.route('/xian_edu_spyder')
+def go_xian_edu_spyder():
+
+    return render_template(
+        'xian_edu_spyder.html',
+
+    )
+
+@app.route('/zhihu_spyder')
+def go_zhihu_spyder():
+
+    return render_template(
+        'zhihu_spyder.html',
+
+    )
 
 @app.route('/help', methods=['GET', 'POST'])
 def go_help():
@@ -182,6 +219,36 @@ def go_help():
 
     )
 
+per_data = {}
+
+@app.route('/progress_data/<uuid>')
+def progress_data(uuid):
+    print(uuid)
+    split_lst = uuid.split('&')
+    print(split_lst)
+    if len(split_lst) == 3:
+        uuid,start_date,end_date = split_lst
+        print(uuid,start_date,end_date)
+        scraper = xian_edu_scraper(start_date,end_date)
+    else:
+        uuid,user_name = split_lst
+        user_homepage = f'https://www.zhihu.com/people/{user_name}'
+        user_info_data = get_user_details(user_homepage)
+        start_url = user_info_data.loc[0,'start_url']
+        scraper = scrap_user_activities(start_url)
+        
+    for total,done in scraper:
+        num_progress = round(int(done) * 100 / int(total), 2)
+        print(num_progress)
+        per_data[uuid] = num_progress
+        print('xxxxxxxxxxxxxxxxxxxxxx')
+    return jsonify({'res': num_progress})
+
+
+@app.route('/show_progress/<uuid>')
+def show_progress(uuid):
+    print(per_data)
+    return jsonify({'res': per_data[uuid]})
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)

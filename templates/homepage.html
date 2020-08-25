@@ -9,6 +9,7 @@
     <link href="{{ url_for('static', filename='css/colResizable.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/selfy.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/jquery-ui.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/bootstrap-datepicker.css') }}" rel="stylesheet">
 
 
     <script src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
@@ -18,6 +19,8 @@
     <script src="{{url_for('static', filename='js/bootstrap-table.js')}}"></script>
     <script src="{{url_for('static', filename='js/bootstrap-table-zh-CN.js')}}"></script>
     <script src="{{url_for('static', filename='js/jquery-ui.js')}}"></script>
+    <script src="{{url_for('static', filename='js/bootstrap-datepicker.min.js')}}"></script>
+
 
 
 </head>
@@ -43,10 +46,10 @@
                 爬虫
               </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">西安市教育局</a>
+                        <a class="dropdown-item" href="/xian_edu_spyder">西安市教育局</a>
                         <a class="dropdown-item" href="#">阳光高考</a>
 
-                        <a class="dropdown-item" href="#">知乎</a>
+                        <a class="dropdown-item" href="/zhihu_spyder">知乎</a>
                     </div>
                 </li>
 

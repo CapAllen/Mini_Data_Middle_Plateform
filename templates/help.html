@@ -1,262 +1,1454 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 
 <head>
-    <meta charset="UTF-8" name="save" content="history">
-    <title>创研中心数据中台</title>
-    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
-
-    <link href="{{ url_for('static', filename='css/jPaginate.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/selfy.css') }}" rel="stylesheet">
-
-
-    <script src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
-    <script src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
-    <script src="{{url_for('static', filename='js/jquery.paginate.js')}}"></script>
-    <script src="{{url_for('static', filename='js/colResizable-1.5.min.js')}}"></script>
-    <script src="{{url_for('static', filename='js/table_related.js')}}"></script>
-    <script src="{{url_for('static', filename='js/base-loading.js')}}"></script>
-    <!-- <script src="{{url_for('static', filename='js/dataTables.bootstrap4.min.js')}}"></script>
-    <script src="{{url_for('static', filename='js/jquery.dataTables.min.js')}}"></script> -->
-
-
-    <link href="{{ url_for('static', filename='style/github-bf51422f4bb36427d391e4b75a1daa083c2d840e.css')}}" media="all" rel="stylesheet" type="text/css" />
-    <link href="{{ url_for('static', filename='style/github2-d731afd4f624c99a4b19ad69f3083cd6d02b81d5.css')}}" media="all" rel="stylesheet" type="text/css" />
-    <link href="{{ url_for('static', filename='css/zTreeStyle/zTreeStyle.css')}}" media="all" rel="stylesheet" type="text/css" />
-    <style>
-        pre {
-            counter-reset: line-numbering;
-            border: solid 1px #d9d9d9;
-            border-radius: 0;
-            background: #fff;
-            padding: 0;
-            line-height: 23px;
-            margin-bottom: 30px;
-            white-space: pre;
-            overflow-x: auto;
-            word-break: inherit;
-            word-wrap: inherit;
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width initial-scale=1'>
+    <title>help</title>
+    <link href='https://fonts.loli.net/css?family=Open+Sans:400italic,700italic,700,400&subset=latin,latin-ext' rel='stylesheet' type='text/css' />
+    <style type='text/css'>
+        html {
+            overflow-x: initial !important;
         }
         
-        pre a::before {
-            content: counter(line-numbering);
-            counter-increment: line-numbering;
-            padding-right: 1em;
-            /* space after numbers */
-            width: 25px;
-            text-align: right;
-            opacity: 0.7;
-            display: inline-block;
-            color: #aaa;
-            background: #eee;
-            margin-right: 16px;
-            padding: 2px 10px;
-            font-size: 13px;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
+         :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --select-text-bg-color: #B5D6FC;
+            --select-text-font-color: auto;
+            --monospace: "Lucida Console", Consolas, "Courier", monospace;
+        }
+        
+        html {
+            font-size: 14px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        body {
+            margin: 0px;
+            padding: 0px;
+            height: auto;
+            bottom: 0px;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            font-size: 1rem;
+            line-height: 1.42857;
+            overflow-x: hidden;
+            background: inherit;
+        }
+        
+        iframe {
+            margin: auto;
+        }
+        
+        a.url {
+            word-break: break-all;
+        }
+        
+        a:active,
+        a:hover {
+            outline: 0px;
+        }
+        
+        .in-text-selection,
+         ::selection {
+            text-shadow: none;
+            background: var(--select-text-bg-color);
+            color: var(--select-text-font-color);
+        }
+        
+        #write {
+            margin: 0px auto;
+            height: auto;
+            width: inherit;
+            word-break: normal;
+            word-wrap: break-word;
+            position: relative;
+            white-space: normal;
+            overflow-x: visible;
+            padding-top: 40px;
+        }
+        
+        #write.first-line-indent p {
+            text-indent: 2em;
+        }
+        
+        #write.first-line-indent li p,
+        #write.first-line-indent p * {
+            text-indent: 0px;
+        }
+        
+        #write.first-line-indent li {
+            margin-left: 2em;
+        }
+        
+        .for-image #write {
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+        
+        body.typora-export {
+            padding-left: 30px;
+            padding-right: 30px;
+        }
+        
+        .typora-export .footnote-line,
+        .typora-export li,
+        .typora-export p {
+            white-space: pre-wrap;
+        }
+        
+        @media screen and (max-width: 500px) {
+            body.typora-export {
+                padding-left: 0px;
+                padding-right: 0px;
+            }
+            #write {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+            .CodeMirror-sizer {
+                margin-left: 0px !important;
+            }
+            .CodeMirror-gutters {
+                display: none !important;
+            }
+        }
+        
+        #write li>figure:first-child {
+            margin-top: -20px;
+        }
+        
+        #write ol,
+        #write ul {
+            position: relative;
+        }
+        
+        img {
+            /* max-width: 100%; */
+            vertical-align: middle;
+        }
+        
+        button,
+        input,
+        select,
+        textarea {
+            color: inherit;
+            font-style: inherit;
+            font-variant: inherit;
+            font-weight: inherit;
+            font-stretch: inherit;
+            font-size: inherit;
+            line-height: inherit;
+            font-family: inherit;
+        }
+        
+        input[type="checkbox"],
+        input[type="radio"] {
+            line-height: normal;
+            padding: 0px;
+        }
+        
+        *,
+         ::after,
+         ::before {
+            box-sizing: border-box;
+        }
+        
+        #write h1,
+        #write h2,
+        #write h3,
+        #write h4,
+        #write h5,
+        #write h6,
+        #write p,
+        #write pre {
+            width: inherit;
+        }
+        
+        #write h1,
+        #write h2,
+        #write h3,
+        #write h4,
+        #write h5,
+        #write h6,
+        #write p {
+            position: relative;
+        }
+        
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            break-after: avoid-page;
+            break-inside: avoid;
+            orphans: 2;
+        }
+        
+        p {
+            orphans: 4;
+        }
+        
+        h1 {
+            font-size: 2rem;
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+        }
+        
+        h3 {
+            font-size: 1.6rem;
+        }
+        
+        h4 {
+            font-size: 1.4rem;
+        }
+        
+        h5 {
+            font-size: 1.2rem;
+        }
+        
+        h6 {
+            font-size: 1rem;
+        }
+        
+        .md-math-block,
+        .md-rawblock,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        p {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .md-blockmeta {
+            color: rgb(204, 204, 204);
+            font-weight: 700;
+            font-style: italic;
+        }
+        
+        a {
+            cursor: pointer;
+        }
+        
+        sup.md-footnote {
+            padding: 2px 4px;
+            background-color: rgba(238, 238, 238, 0.7);
+            color: rgb(85, 85, 85);
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        sup.md-footnote a,
+        sup.md-footnote a:hover {
+            color: inherit;
+            text-transform: inherit;
+            text-decoration: inherit;
+        }
+        
+        #write input[type="checkbox"] {
+            cursor: pointer;
+            width: inherit;
+            height: inherit;
+        }
+        
+        figure {
+            overflow-x: auto;
+            margin: 1.2em 0px;
+            max-width: calc(100% + 16px);
+            padding: 0px;
+        }
+        
+        figure>table {
+            margin: 0px !important;
+        }
+        
+        tr {
+            break-inside: avoid;
+            break-after: auto;
+        }
+        
+        thead {
+            display: table-header-group;
+        }
+        
+        table {
+            border-collapse: collapse;
+            border-spacing: 0px;
+            width: 100%;
+            overflow: auto;
+            break-inside: auto;
+            text-align: left;
+        }
+        
+        table.md-table td {
+            min-width: 32px;
+        }
+        
+        .CodeMirror-gutters {
+            border-right: 0px;
+            background-color: inherit;
+        }
+        
+        .CodeMirror-linenumber {
             user-select: none;
         }
         
-        pre a:first-of-type::before {
-            padding-top: 10px;
+        .CodeMirror {
+            text-align: left;
         }
         
-        pre a:last-of-type::before {
-            padding-bottom: 10px;
+        .CodeMirror-placeholder {
+            opacity: 0.3;
         }
         
-        pre a:only-of-type::before {
-            padding: 10px;
+        .CodeMirror pre {
+            padding: 0px 4px;
         }
         
-        .highlight {
-            background-color: #ffffcc
+        .CodeMirror-lines {
+            padding: 0px;
         }
-        /* RIGHT */
+        
+        div.hr:focus {
+            cursor: none;
+        }
+        
+        #write pre {
+            white-space: pre-wrap;
+        }
+        
+        #write.fences-no-line-wrapping pre {
+            white-space: pre;
+        }
+        
+        #write pre.ty-contain-cm {
+            white-space: normal;
+        }
+        
+        .CodeMirror-gutters {
+            margin-right: 4px;
+        }
+        
+        .md-fences {
+            font-size: 0.9rem;
+            display: block;
+            break-inside: avoid;
+            text-align: left;
+            overflow: visible;
+            white-space: pre;
+            background: inherit;
+            position: relative !important;
+        }
+        
+        .md-diagram-panel {
+            width: 100%;
+            margin-top: 10px;
+            text-align: center;
+            padding-top: 0px;
+            padding-bottom: 8px;
+            overflow-x: auto;
+        }
+        
+        #write .md-fences.mock-cm {
+            white-space: pre-wrap;
+        }
+        
+        .md-fences.md-fences-with-lineno {
+            padding-left: 0px;
+        }
+        
+        #write.fences-no-line-wrapping .md-fences.mock-cm {
+            white-space: pre;
+            overflow-x: auto;
+        }
+        
+        .md-fences.mock-cm.md-fences-with-lineno {
+            padding-left: 8px;
+        }
+        
+        .CodeMirror-line,
+        twitterwidget {
+            break-inside: avoid;
+        }
+        
+        .footnotes {
+            opacity: 0.8;
+            font-size: 0.9rem;
+            margin-top: 1em;
+            margin-bottom: 1em;
+        }
+        
+        .footnotes+.footnotes {
+            margin-top: 0px;
+        }
+        
+        .md-reset {
+            margin: 0px;
+            padding: 0px;
+            border: 0px;
+            outline: 0px;
+            vertical-align: top;
+            background: 0px 0px;
+            text-decoration: none;
+            text-shadow: none;
+            float: none;
+            position: static;
+            width: auto;
+            height: auto;
+            white-space: nowrap;
+            cursor: inherit;
+            -webkit-tap-highlight-color: transparent;
+            line-height: normal;
+            font-weight: 400;
+            text-align: left;
+            box-sizing: content-box;
+            direction: ltr;
+        }
+        
+        li div {
+            padding-top: 0px;
+        }
+        
+        blockquote {
+            margin: 1rem 0px;
+        }
+        
+        li .mathjax-block,
+        li p {
+            margin: 0.5rem 0px;
+        }
+        
+        li {
+            margin: 0px;
+            position: relative;
+        }
+        
+        blockquote> :last-child {
+            margin-bottom: 0px;
+        }
+        
+        blockquote> :first-child,
+        li> :first-child {
+            margin-top: 0px;
+        }
+        
+        .footnotes-area {
+            color: rgb(136, 136, 136);
+            margin-top: 0.714rem;
+            padding-bottom: 0.143rem;
+            white-space: normal;
+        }
+        
+        #write .footnote-line {
+            white-space: pre-wrap;
+        }
+        
+        @media print {
+            body,
+            html {
+                border: 1px solid transparent;
+                height: 99%;
+                break-after: avoid;
+                break-before: avoid;
+            }
+            #write {
+                margin-top: 0px;
+                padding-top: 0px;
+                border-color: transparent !important;
+            }
+            .typora-export * {
+                -webkit-print-color-adjust: exact;
+            }
+            html.blink-to-pdf {
+                font-size: 13px;
+            }
+            .typora-export #write {
+                padding-left: 32px;
+                padding-right: 32px;
+                padding-bottom: 0px;
+                break-after: avoid;
+            }
+            .typora-export #write::after {
+                height: 0px;
+            }
+            @page {
+                margin: 20mm 0px;
+            }
+        }
+        
+        .footnote-line {
+            margin-top: 0.714em;
+            font-size: 0.7em;
+        }
+        
+        a img,
+        img a {
+            cursor: pointer;
+        }
+        
+        pre.md-meta-block {
+            font-size: 0.8rem;
+            min-height: 0.8rem;
+            white-space: pre-wrap;
+            background: rgb(204, 204, 204);
+            display: block;
+            overflow-x: hidden;
+        }
+        
+        p>.md-image:only-child:not(.md-img-error) img,
+        p>img:only-child {
+            display: block;
+            margin: auto;
+        }
+        
+        p>.md-image:only-child {
+            display: inline-block;
+            width: 100%;
+        }
+        
+        #write .MathJax_Display {
+            margin: 0.8em 0px 0px;
+        }
+        
+        .md-math-block {
+            width: 100%;
+        }
+        
+        .md-math-block:not(:empty)::after {
+            display: none;
+        }
+        
+        [contenteditable="true"]:active,
+        [contenteditable="true"]:focus {
+            outline: 0px;
+            box-shadow: none;
+        }
+        
+        .md-task-list-item {
+            position: relative;
+            list-style-type: none;
+        }
+        
+        .task-list-item.md-task-list-item {
+            padding-left: 0px;
+        }
+        
+        .md-task-list-item>input {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            margin-left: -1.2em;
+            margin-top: calc(1em - 10px);
+            border: none;
+        }
+        
+        .math {
+            font-size: 1rem;
+        }
+        
+        .md-toc {
+            min-height: 3.58rem;
+            position: relative;
+            font-size: 0.9rem;
+            border-radius: 10px;
+        }
+        
+        .md-toc-content {
+            position: relative;
+            margin-left: 0px;
+        }
+        
+        .md-toc-content::after,
+        .md-toc::after {
+            display: none;
+        }
+        
+        .md-toc-item {
+            display: block;
+            color: rgb(65, 131, 196);
+        }
+        
+        .md-toc-item a {
+            text-decoration: none;
+        }
+        
+        .md-toc-inner:hover {
+            text-decoration: underline;
+        }
+        
+        .md-toc-inner {
+            display: inline-block;
+            cursor: pointer;
+        }
+        
+        .md-toc-h1 .md-toc-inner {
+            margin-left: 0px;
+            font-weight: 700;
+        }
+        
+        .md-toc-h2 .md-toc-inner {
+            margin-left: 2em;
+        }
+        
+        .md-toc-h3 .md-toc-inner {
+            margin-left: 4em;
+        }
+        
+        .md-toc-h4 .md-toc-inner {
+            margin-left: 6em;
+        }
+        
+        .md-toc-h5 .md-toc-inner {
+            margin-left: 8em;
+        }
+        
+        .md-toc-h6 .md-toc-inner {
+            margin-left: 10em;
+        }
+        
+        @media screen and (max-width: 48em) {
+            .md-toc-h3 .md-toc-inner {
+                margin-left: 3.5em;
+            }
+            .md-toc-h4 .md-toc-inner {
+                margin-left: 5em;
+            }
+            .md-toc-h5 .md-toc-inner {
+                margin-left: 6.5em;
+            }
+            .md-toc-h6 .md-toc-inner {
+                margin-left: 8em;
+            }
+        }
+        
+        a.md-toc-inner {
+            font-size: inherit;
+            font-style: inherit;
+            font-weight: inherit;
+            line-height: inherit;
+        }
+        
+        .footnote-line a:not(.reversefootnote) {
+            color: inherit;
+        }
+        
+        .md-attr {
+            display: none;
+        }
+        
+        .md-fn-count::after {
+            content: ".";
+        }
+        
+        code,
+        pre,
+        samp,
+        tt {
+            font-family: var(--monospace);
+        }
+        
+        kbd {
+            margin: 0px 0.1em;
+            padding: 0.1em 0.6em;
+            font-size: 0.8em;
+            color: rgb(36, 39, 41);
+            background: rgb(255, 255, 255);
+            border: 1px solid rgb(173, 179, 185);
+            border-radius: 3px;
+            box-shadow: rgba(12, 13, 14, 0.2) 0px 1px 0px, rgb(255, 255, 255) 0px 0px 0px 2px inset;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+        
+        .md-comment {
+            color: rgb(162, 127, 3);
+            opacity: 0.8;
+            font-family: var(--monospace);
+        }
+        
+        code {
+            text-align: left;
+            vertical-align: initial;
+        }
+        
+        a.md-print-anchor {
+            white-space: pre !important;
+            border-width: initial !important;
+            border-style: none !important;
+            border-color: initial !important;
+            display: inline-block !important;
+            position: absolute !important;
+            width: 1px !important;
+            right: 0px !important;
+            outline: 0px !important;
+            background: 0px 0px !important;
+            text-decoration: initial !important;
+            text-shadow: initial !important;
+        }
+        
+        .md-inline-math .MathJax_SVG .noError {
+            display: none !important;
+        }
+        
+        .html-for-mac .inline-math-svg .MathJax_SVG {
+            vertical-align: 0.2px;
+        }
+        
+        .md-math-block .MathJax_SVG_Display {
+            text-align: center;
+            margin: 0px;
+            position: relative;
+            text-indent: 0px;
+            max-width: none;
+            max-height: none;
+            min-height: 0px;
+            min-width: 100%;
+            width: auto;
+            overflow-y: hidden;
+            display: block !important;
+        }
+        
+        .MathJax_SVG_Display,
+        .md-inline-math .MathJax_SVG_Display {
+            width: auto;
+            margin: inherit;
+            display: inline-block !important;
+        }
+        
+        .MathJax_SVG .MJX-monospace {
+            font-family: var(--monospace);
+        }
+        
+        .MathJax_SVG .MJX-sans-serif {
+            font-family: sans-serif;
+        }
+        
+        .MathJax_SVG {
+            display: inline;
+            font-style: normal;
+            font-weight: 400;
+            line-height: normal;
+            zoom: 90%;
+            text-indent: 0px;
+            text-align: left;
+            text-transform: none;
+            letter-spacing: normal;
+            word-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            float: none;
+            direction: ltr;
+            max-width: none;
+            max-height: none;
+            min-width: 0px;
+            min-height: 0px;
+            border: 0px;
+            padding: 0px;
+            margin: 0px;
+        }
+        
+        .MathJax_SVG * {
+            transition: none;
+        }
+        
+        .MathJax_SVG_Display svg {
+            vertical-align: middle !important;
+            margin-bottom: 0px !important;
+        }
+        
+        .os-windows.monocolor-emoji .md-emoji {
+            font-family: "Segoe UI Symbol", sans-serif;
+        }
+        
+        .md-diagram-panel>svg {
+            max-width: 100%;
+        }
+        
+        [lang="mermaid"] svg,
+        [lang="flow"] svg {
+            max-width: 100%;
+        }
+        
+        [lang="mermaid"] .node text {
+            font-size: 1rem;
+        }
+        
+        table tr th {
+            border-bottom: 0px;
+        }
+        
+        video {
+            max-width: 100%;
+            display: block;
+            margin: 0px auto;
+        }
+        
+        iframe {
+            max-width: 100%;
+            width: 100%;
+            border: none;
+        }
+        
+        .highlight td,
+        .highlight tr {
+            border: 0px;
+        }
+        
+         :root {
+            --side-bar-bg-color: #fafafa;
+            --control-text-color: #777;
+        }
+        
+        html {
+            font-size: 16px;
+        }
+        
+        body {
+            font-family: "Open Sans", "Clear Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: rgb(51, 51, 51);
+            line-height: 1.6;
+        }
+        
+        #write {
+            max-width: 860px;
+            margin: 0px auto;
+            padding: 30px 30px 100px;
+        }
+        
+        #write>ul:first-child,
+        #write>ol:first-child {
+            margin-top: 30px;
+        }
+        
+        a {
+            color: rgb(65, 131, 196);
+        }
+        
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            position: relative;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            line-height: 1.4;
+            cursor: text;
+        }
+        
+        h1:hover a.anchor,
+        h2:hover a.anchor,
+        h3:hover a.anchor,
+        h4:hover a.anchor,
+        h5:hover a.anchor,
+        h6:hover a.anchor {
+            text-decoration: none;
+        }
+        
+        h1 tt,
+        h1 code {
+            font-size: inherit;
+        }
+        
+        h2 tt,
+        h2 code {
+            font-size: inherit;
+        }
+        
+        h3 tt,
+        h3 code {
+            font-size: inherit;
+        }
+        
+        h4 tt,
+        h4 code {
+            font-size: inherit;
+        }
+        
+        h5 tt,
+        h5 code {
+            font-size: inherit;
+        }
+        
+        h6 tt,
+        h6 code {
+            font-size: inherit;
+        }
+        
+        h1 {
+            padding-bottom: 0.3em;
+            font-size: 2.25em;
+            line-height: 1.2;
+            border-bottom: 1px solid rgb(238, 238, 238);
+        }
+        
+        h2 {
+            padding-bottom: 0.3em;
+            font-size: 1.75em;
+            line-height: 1.225;
+            border-bottom: 1px solid rgb(238, 238, 238);
+        }
+        
+        h3 {
+            font-size: 1.5em;
+            line-height: 1.43;
+        }
+        
+        h4 {
+            font-size: 1.25em;
+        }
+        
+        h5 {
+            font-size: 1em;
+        }
+        
+        h6 {
+            font-size: 1em;
+            color: rgb(119, 119, 119);
+        }
+        
+        p,
+        blockquote,
+        ul,
+        ol,
+        dl,
+        table {
+            margin: 0.8em 0px;
+        }
+        
+        li>ol,
+        li>ul {
+            margin: 0px;
+        }
+        
+        hr {
+            height: 2px;
+            padding: 0px;
+            margin: 16px 0px;
+            background-color: rgb(231, 231, 231);
+            border: 0px none;
+            overflow: hidden;
+            box-sizing: content-box;
+        }
+        
+        li p.first {
+            display: inline-block;
+        }
+        
+        ul,
+        ol {
+            padding-left: 30px;
+        }
+        
+        ul:first-child,
+        ol:first-child {
+            margin-top: 0px;
+        }
+        
+        ul:last-child,
+        ol:last-child {
+            margin-bottom: 0px;
+        }
+        
+        blockquote {
+            border-left: 4px solid rgb(223, 226, 229);
+            padding: 0px 15px;
+            color: rgb(119, 119, 119);
+        }
+        
+        blockquote blockquote {
+            padding-right: 0px;
+        }
+        
+        table {
+            padding: 0px;
+            word-break: initial;
+        }
+        
+        table tr {
+            border-top: 1px solid rgb(223, 226, 229);
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        table tr:nth-child(2n),
+        thead {
+            background-color: rgb(248, 248, 248);
+        }
+        
+        table tr th {
+            font-weight: bold;
+            border-width: 1px 1px 0px;
+            border-top-style: solid;
+            border-right-style: solid;
+            border-left-style: solid;
+            border-top-color: rgb(223, 226, 229);
+            border-right-color: rgb(223, 226, 229);
+            border-left-color: rgb(223, 226, 229);
+            border-image: initial;
+            border-bottom-style: initial;
+            border-bottom-color: initial;
+            text-align: left;
+            margin: 0px;
+            padding: 6px 13px;
+        }
+        
+        table tr td {
+            border: 1px solid rgb(223, 226, 229);
+            text-align: left;
+            margin: 0px;
+            padding: 6px 13px;
+        }
+        
+        table tr th:first-child,
+        table tr td:first-child {
+            margin-top: 0px;
+        }
+        
+        table tr th:last-child,
+        table tr td:last-child {
+            margin-bottom: 0px;
+        }
+        
+        .CodeMirror-lines {
+            padding-left: 4px;
+        }
+        
+        .code-tooltip {
+            box-shadow: rgba(0, 28, 36, 0.3) 0px 1px 1px 0px;
+            border-top: 1px solid rgb(238, 242, 242);
+        }
+        
+        .md-fences,
+        code,
+        tt {
+            border: 1px solid rgb(231, 234, 237);
+            background-color: rgb(248, 248, 248);
+            border-radius: 3px;
+            padding: 2px 4px 0px;
+            font-size: 0.9em;
+        }
+        
+        code {
+            background-color: rgb(243, 244, 244);
+            padding: 0px 2px;
+        }
+        
+        .md-fences {
+            margin-bottom: 15px;
+            margin-top: 15px;
+            padding-top: 8px;
+            padding-bottom: 6px;
+        }
+        
+        .md-task-list-item>input {
+            margin-left: -1.3em;
+        }
+        
+        @media print {
+            html {
+                font-size: 13px;
+            }
+            table,
+            pre {
+                break-inside: avoid;
+            }
+            pre {
+                word-wrap: break-word;
+            }
+        }
+        
+        .md-fences {
+            background-color: rgb(248, 248, 248);
+        }
+        
+        #write pre.md-meta-block {
+            padding: 1rem;
+            font-size: 85%;
+            line-height: 1.45;
+            background-color: rgb(247, 247, 247);
+            border: 0px;
+            border-radius: 3px;
+            color: rgb(119, 119, 119);
+            margin-top: 0px !important;
+        }
+        
+        .mathjax-block>.code-tooltip {
+            bottom: 0.375rem;
+        }
+        
+        .md-mathjax-midline {
+            background: rgb(250, 250, 250);
+        }
+        
+        #write>h3.md-focus::before {
+            left: -1.5625rem;
+            top: 0.375rem;
+        }
+        
+        #write>h4.md-focus::before {
+            left: -1.5625rem;
+            top: 0.285714rem;
+        }
+        
+        #write>h5.md-focus::before {
+            left: -1.5625rem;
+            top: 0.285714rem;
+        }
+        
+        #write>h6.md-focus::before {
+            left: -1.5625rem;
+            top: 0.285714rem;
+        }
+        
+        .md-image>.md-meta {
+            border-radius: 3px;
+            padding: 2px 0px 0px 4px;
+            font-size: 0.9em;
+            color: inherit;
+        }
+        
+        .md-tag {
+            color: rgb(167, 167, 167);
+            opacity: 1;
+        }
+        
+        .md-toc {
+            margin-top: 20px;
+            padding-bottom: 20px;
+        }
+        
+        .sidebar-tabs {
+            border-bottom: none;
+        }
+        
+        #typora-quick-open {
+            border: 1px solid rgb(221, 221, 221);
+            background-color: rgb(248, 248, 248);
+        }
+        
+        #typora-quick-open-item {
+            background-color: rgb(250, 250, 250);
+            border-color: rgb(254, 254, 254) rgb(229, 229, 229) rgb(229, 229, 229) rgb(238, 238, 238);
+            border-style: solid;
+            border-width: 1px;
+        }
+        
+        .on-focus-mode blockquote {
+            border-left-color: rgba(85, 85, 85, 0.12);
+        }
+        
+        header,
+        .context-menu,
+        .megamenu-content,
+        footer {
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+        
+        .file-node-content:hover .file-node-icon,
+        .file-node-content:hover .file-node-open-state {
+            visibility: visible;
+        }
+        
+        .mac-seamless-mode #typora-sidebar {
+            background-color: var(--side-bar-bg-color);
+        }
+        
+        .md-lang {
+            color: rgb(180, 101, 77);
+        }
+        
+        .html-for-mac .context-menu {
+            --item-hover-bg-color: #E6F0FE;
+        }
+        
+        #md-notification .btn {
+            border: 0px;
+        }
+        
+        .dropdown-menu .divider {
+            border-color: rgb(229, 229, 229);
+        }
+        
+        .typora-export li,
+        .typora-export p,
+        .typora-export,
+        .footnote-line {
+            white-space: normal;
+        }
     </style>
 </head>
 
-<body>
-
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="/">数据中台</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item ">
-                    <a class="nav-link" href="/database_manager">数据库管理 <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/">问答系统测试</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                爬虫
-              </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">西安市教育局</a>
-                        <a class="dropdown-item" href="#">阳光高考</a>
-
-                        <a class="dropdown-item" href="#">知乎</a>
-                    </div>
-                </li>
-
+<body class='typora-export os-windows'>
+    <div id='write' class='is-node'>
+        <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+        <script src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
+        <script src="{{url_for('static', filename='js/2html.js')}}"></script>
+        <blockquote>
+            <p>版本：alpha 0.5</p>
+            <p>更新日期：2020-08-25</p>
+        </blockquote>
+        <h1>
+            <a name='header-n4' class='md-header-anchor '></a>基本介绍</h1>
+        <p>本数据微中台项目，只服务于部门内部，方便各位及时把控教育相关动向、运营方法策略；自主完成数据库的增删改查；按需爬取市教育局、阳光高考、知乎等平台信息；按需自主完成高校卡片、同位次流向等数据产品的制作等，更多功能会陆续完善。</p>
+        <p>根据如上需求，本文档侧重于数据微中台自主操作的从0到1教程，主要包括：</p>
+        <ul>
+            <li>数据库管理</li>
+            <li>爬虫</li>
+            <li>数据产品制作</li>
+        </ul>
+        <h1>
+            <a name='header-n14' class='md-header-anchor '></a>数据库管理</h1>
+        <h2>
+            <a name='header-n15' class='md-header-anchor '></a>选择数据库</h2>
+        <ul>
+            <li>点击导航栏中的<strong>数据库管理</strong>，即可进入『数据库选择』页面</li>
+        </ul>
+        <p><img src='./../static/img/1598332330111.png' alt='1598332330111' referrerPolicy='no-referrer' /></p>
+        <ul>
+            <li>点击数据库下方的『选择』，即可进入对应数据库</li>
+        </ul>
+        <p><img src='../static/img/1598336200327.png' alt='1598336200327' referrerPolicy='no-referrer' /></p>
+        <h2>
+            <a name='header-n26' class='md-header-anchor '></a>数据筛选</h2>
+        <ul>
+            <li>在进入数据库后，可在对应列的输入框中输入筛选条件，规则如下：</li>
+        </ul>
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th>符号</th>
+                        <th>解释</th>
+                        <th>示例</th>
+                        <th>示例解释</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>=</td>
+                        <td>筛选该列中<strong>等于</strong>某值的数据</td>
+                        <td>= 江南大学</td>
+                        <td>筛选出所有江南大学的数据</td>
+                    </tr>
+                    <tr>
+                        <td>&gt;</td>
+                        <td>筛选该列中<strong>大于</strong>某值的数据</td>
+                        <td>&gt; 500</td>
+                        <td>筛选出所有大于500的数据</td>
+                    </tr>
+                    <tr>
+                        <td>&lt;</td>
+                        <td>筛选该列中<strong>小于</strong>某值的数据</td>
+                        <td>&lt; 500</td>
+                        <td>筛选出所有小于500的数据</td>
+                    </tr>
+                    <tr>
+                        <td>!</td>
+                        <td>筛选该列<strong>不等于</strong>某值的数据</td>
+                        <td>! 2015</td>
+                        <td>筛选出不等于2015的数据</td>
+                    </tr>
+                    <tr>
+                        <td>in</td>
+                        <td>筛选该列<strong>取某些值</strong>的数据</td>
+                        <td>in 北京，天津，上海</td>
+                        <td>筛选出北京，天津和上海的数据</td>
+                    </tr>
+                    <tr>
+                        <td>x</td>
+                        <td><strong>不筛选</strong>某列</td>
+                        <td>x</td>
+                        <td>标记在哪列，则哪列不被筛选</td>
+                    </tr>
+                </tbody>
+            </table>
+        </figure>
+        <blockquote>
+            <p>在如下规则中：</p>
+            <ul>
+                <li>首字必须是『符号』；</li>
+                <li>符号后有无空格均可；</li>
+                <li>符号不区分中英文和大小写；</li>
             </ul>
-            <ul class="navbar-nav ml-0">
-                <li class="nav-item ">
-                    <a class="nav-link" href="/help" tabindex="-1" aria-disabled="true">帮助</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-    <div class="container">
-        <div>
-            <div style='width:25%;'>
-                <ul id="tree" class="ztree" style='width:100%'>
-
+            <p>
+                <font color="#d81e06">如果非必需，最好不要筛选出全部数据，否则浏览器会因为数据量太大而崩溃！</font>
+            </p>
+        </blockquote>
+        <p>支持多条件筛选，如下图所示，筛选出江南大学在北京、天津的招生数据，但不包含批次线：</p>
+        <p><img src='../static/img/1598336279831.png' alt='1598336279831' referrerPolicy='no-referrer' /></p>
+        <p>&nbsp;</p>
+        <ul>
+            <li>完成规则输入后，点击『查看数据』按钮，即可获得筛选结果</li>
+        </ul>
+        <p><img src='../static/img/1598336298921.png' alt='1598336298921' referrerPolicy='no-referrer' /></p>
+        <p>&nbsp;</p>
+        <h2>
+            <a name='header-n84' class='md-header-anchor '></a>修改、添加、删除数据</h2>
+        <h3>
+            <a name='header-n85' class='md-header-anchor '></a>修改</h3>
+        <ul>
+            <li>只需点击相应文本框，进行修改即可，已修改的数据会标记颜色。如下所示</li>
+        </ul>
+        <p><img src='../static/img/1598336344945.png' alt='1598336344945' referrerPolicy='no-referrer' /></p>
+        <p>&nbsp;</p>
+        <h3>
+            <a name='header-n91' class='md-header-anchor '></a>添加</h3>
+        <ul>
+            <li>点击下方『添加一行』按钮，在最下方新出现的空白行中，输入数据即可。如下图，添加“江北大学”数据。</li>
+        </ul>
+        <blockquote>
+            <p>注意：在添加数据时，一定要<strong>保证新输入的数据与原始数据类型相同</strong>，如院校名称为文本数据，那就必须在下面输入文本，分数必须输入数字，若当前还未收集到该数据，对于<strong>文本可以用<code>-</code>填充</strong>，<strong>数字用<code>-1</code>填充</strong>。</p>
+        </blockquote>
+        <p><img src='../static/img/1598336392121.png' alt='1598336392121' referrerPolicy='no-referrer' /></p>
+        <p>&nbsp;</p>
+        <h3>
+            <a name='header-n99' class='md-header-anchor '></a>删除</h3>
+        <ul>
+            <li>在左侧的『标记删除』中，勾选想要删除的数据即可。</li>
+        </ul>
+        <p><img src='../static/img/1598336407417.png' alt='1598336407417' referrerPolicy='no-referrer' /></p>
+        <p>&nbsp;</p>
+        <h2>
+            <a name='header-n105' class='md-header-anchor '></a>提交修改</h2>
+        <p>在完成上述数据修改、添加或删除动作后，点击『提交修改』按钮，即可将所有修改、添加、删除的数据更新到数据库中，并得到更新后的数据。</p>
+        <p>&nbsp;</p>
+        <h2>
+            <a name='header-n108' class='md-header-anchor '></a>下载数据</h2>
+        <p>提供两种情况下的数据下载：</p>
+        <ul>
+            <li>
+                <p>当需要筛选的数据较多，并且不需要修改数据时，可以在输入筛选条件后，点击『直接下载』按钮后，完成下载。</p>
+                <blockquote>
+                    <p>在此情况下，不会展示筛选后的数据。</p>
+                </blockquote>
+                <p><img src='../static/img/1598336575586.png' alt='1598336575586' referrerPolicy='no-referrer' /></p>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <p>当需要对数据修改时，应尽量精细筛选条件，减少筛选后的数据条目。在完成筛选，并提交修改后，可点击『点击下载』按钮，即可下载当前显示数据的Excel文件。</p>
+                <blockquote>
+                    <p>注意：若修改数据后，一定要先提交修改，再下载数据。</p>
+                </blockquote>
+                <p><img src='../static/img/1598336656116.png' alt='1598336656116' referrerPolicy='no-referrer' /></p>
+            </li>
+        </ul>
+        <p>&nbsp;</p>
+        <h2>
+            <a name='header-n112' class='md-header-anchor '></a>新建数据库</h2>
+        <p>可以点击【数据库管理】页面中的『新建数据库』按钮，进入数据库新建页面：</p>
+        <p><img src='../static/img/1598336797303.png' alt='1598336797303' referrerPolicy='no-referrer' /></p>
+        <p>步骤为：</p>
+        <ul>
+            <li>点击『浏览』，上传准备入库的Excel文件；</li>
+            <li>在左框中，输入<strong>数据库名称</strong>，会显示为【数据库管理】页面中数据库卡片的标题；</li>
+            <li>在右框中，输入<strong>数据库介绍</strong>，解释数据库包含内容，会显示为【数据库管理】页面中数据库卡片的详情。</li>
+        </ul>
+        <p>注意事项：</p>
+        <ul>
+            <li>上传的Excel文件，每个列都要有列名，并且不重复；</li>
+            <li>没有多级列或行标签；</li>
+            <li>不能包含合并单元格；</li>
+            <li><strong>数据库的上传速度约为每秒200条数据，点击『提交』按钮后，需等数据上传完毕才能进行其他动作。</strong></li>
+        </ul>
+        <p>如下是一个标准的可以入库的Excel文件示例：</p>
+        <p><img src='../static/img/1598337728075.png' alt='1598337728075' referrerPolicy='no-referrer' /></p>
+        <h1>
+            <a name='header-n519' class='md-header-anchor '></a>爬虫</h1>
+        <h2>
+            <a name='header-n558' class='md-header-anchor '></a>教育局通知公告爬虫</h2>
+        <blockquote>
+            <p>包含<a href='http://edu.xa.gov.cn/xwzx/tzgg/1.html'>教育局通知公告</a>中的所有文章及附件，文件以如下方式组织：</p>
+            <p><img src='../static/img/1598338567997.png' alt='1598338567997' referrerPolicy='no-referrer' /></p>
+        </blockquote>
+        <ul>
+            <li>
+                <p>点击『爬虫』-『西安市教育局』，即可进入爬虫页面</p>
+                <p><img src='../static/img/1598337857863.png' alt='1598337857863' referrerPolicy='no-referrer' /></p>
+            </li>
+        </ul>
+        <ul>
+            <li>依次点选爬取的起始和终止时间，点击『爬取』即可启动爬虫</li>
+        </ul>
+        <p><img src='../static/img/1598337995341.png' alt='1598337995341' referrerPolicy='no-referrer' /></p>
+        <ul>
+            <li>等待爬取完成（进度条显示），会提示下载。</li>
+        </ul>
+        <p><img src='../static/img/1598338035523.png' alt='1598338035523' referrerPolicy='no-referrer' /></p>
+        <h2>
+            <a name='header-n586' class='md-header-anchor '></a>知乎用户动态爬虫</h2>
+        <blockquote>
+            <p>包含：用户基本信息<code>zhihu_user_info.xlsx</code>和用户动态<code>zhihu_user_activities.xlsx</code>。</p>
+        </blockquote>
+        <ul>
+            <li>打开某知乎用户主页，复制链接，粘贴到输入框中，如下所示：</li>
+        </ul>
+        <p><img src='../static/img/1598338151790.png' alt='1598338151790' referrerPolicy='no-referrer' /></p>
+        <ul>
+            <li>点击『爬取』，待进度条满后，会提示下载。</li>
+        </ul>
+        <h1>
+            <a name='header-n557' class='md-header-anchor '></a>更新日志</h1>
+        <ul>
+            <li>2020-8-17 </li>
+        </ul>
+        <p>上线0.1版本，支持数据的筛选、修改、添加、删除、下载。</p>
+        <ul>
+            <li>
+                <p>2020-8-19</p>
+                <ul>
+                    <li>增加上传文件&amp;新建数据库功能</li>
+                    <li>增加筛选后数据排序功能</li>
                 </ul>
-            </div>
-            <div id='readme' style='width:95%;margin-left:15%;'>
-                <article class='markdown-body'>
-                    <blockquote>
-                        <p>日期：2020-08-17</p>
-                        <p>版本：V0.1</p>
-                    </blockquote>
-                    <h1 id="-">基本介绍</h1>
-                    <p>本数据微中台项目，只服务于部门内部，方便各位及时把控教育相关动向、运营方法策略；自主完成数据库的增删改查；按需爬取市教育局、阳光高考、知乎等平台信息；按需自主完成高校卡片、同位次流向等数据产品的制作等，更多功能会陆续完善。</p>
-                    <p>根据如上需求，本文档侧重于数据微中台自主操作的从0到1教程，主要包括：</p>
-                    <ul>
-                        <li>数据库管理</li>
-                        <li>爬虫</li>
-                        <li>数据产品制作</li>
-                    </ul>
-                    <h1 id="-">数据库管理</h1>
-                    <h2 id="-">选择数据库</h2>
-                    <ul>
-                        <li>点击导航栏中的<strong>数据库管理</strong>，即可进入『数据库选择』页面</li>
-                    </ul>
-                    <p><img src="{{ url_for('static', filename='img/1597657711722.png')}}" alt="1597657711722"></p>
-                    <ul>
-                        <li>点击数据库下方的『选择』，即可进入对应数据库</li>
-                    </ul>
-                    <p><img src="{{ url_for('static', filename='img/1597657757284.png')}}" alt="1597657757284"></p>
-                    <h2 id="-">数据筛选</h2>
-                    <ul>
-                        <li>在进入数据库后，可在对应列的输入框中输入筛选条件，规则如下：</li>
-                    </ul>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>符号</th>
-                                <th>解释</th>
-                                <th>示例</th>
-                                <th>示例解释</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>=</td>
-                                <td>筛选该列中<strong>等于</strong>某值的数据</td>
-                                <td>= 江南大学</td>
-                                <td>筛选出所有江南大学的数据</td>
-                            </tr>
-                            <tr>
-                                <td>&gt;</td>
-                                <td>筛选该列中<strong>大于</strong>某值的数据</td>
-                                <td>> 500</td>
-                                <td>筛选出所有大于500的数据</td>
-                            </tr>
-                            <tr>
-                                <td>&lt;</td>
-                                <td>筛选该列中<strong>小于</strong>某值的数据</td>
-                                <td>&lt; 500</td>
-                                <td>筛选出所有小于500的数据</td>
-                            </tr>
-                            <tr>
-                                <td>!</td>
-                                <td>筛选该列<strong>不等于</strong>某值的数据</td>
-                                <td>! 2015</td>
-                                <td>筛选出不等于2015的数据</td>
-                            </tr>
-                            <tr>
-                                <td>in</td>
-                                <td>筛选该列<strong>取某些值</strong>的数据</td>
-                                <td>in 北京，天津，上海</td>
-                                <td>筛选出北京，天津和上海的数据</td>
-                            </tr>
-                            <tr>
-                                <td>x</td>
-                                <td><strong>不筛选</strong>某列</td>
-                                <td>x</td>
-                                <td>标记在哪列，则哪列不被筛选</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <blockquote>
-                        <p>在如下规则中：</p>
-                        <ul>
-                            <li>首字必须是『符号』；</li>
-                            <li>符号后有无空格均可；</li>
-                            <li>符号不区分中英文和大小写；</li>
-                        </ul>
-                        <p><img src="{{ url_for('static', filename='img/Skull.png')}}" width="40">
-                            <font color="#d81e06">如果非必需，最好不要筛选出全部数据，否则浏览器会因为数据量太大而崩溃！</font>
-                        </p>
-                    </blockquote>
-                    <p>支持多条件筛选，如下图所示，筛选出江南大学在北京、天津的招生数据，但不包含批次线：</p>
-                    <p><img src="{{ url_for('static', filename='img/1597658607069.png')}}" alt="1597658607069"></p>
-                    <ul>
-                        <li>完成规则输入后，点击『提交』按钮，即可获得筛选结果</li>
-                    </ul>
-                    <p><img src="{{ url_for('static', filename='img/1597660476374.png')}}" alt="1597660476374"></p>
-                    <h2 id="-">修改、添加、删除数据</h2>
-                    <h3 id="-">修改</h3>
-                    <ul>
-                        <li>只需点击相应文本框，进行修改即可，已修改的数据会标记颜色。如下所示</li>
-                    </ul>
-                    <p><img src="{{ url_for('static', filename='img/1597660491057.png')}}" alt="1597660491057"></p>
-                    <h3 id="-">添加</h3>
-                    <ul>
-                        <li>点击下方『添加一行』按钮，在最下方新出现的空白行中，输入数据即可。如下图，添加“江北大学”数据。</li>
-                    </ul>
-                    <blockquote>
-                        <p>注意：在添加数据时，一定要<strong>保证新输入的数据与原始数据类型相同</strong>，如院校名称为文本数据，那就必须在下面输入文本，分数必须输入数字，若当前还未收集到该数据，对于<strong>文本可以用<code>-</code>填充</strong>，<strong>数字用<code>-1</code>填充</strong>。</p>
-                    </blockquote>
-                    <p><img src="{{ url_for('static', filename='img/1597660537775.png')}}" alt="1597660537775"></p>
-                    <h3 id="-">删除</h3>
-                    <ul>
-                        <li>在左侧的『标记删除』中，勾选想要删除的数据即可。</li>
-                    </ul>
-                    <p><img src="{{ url_for('static', filename='img/1597660666048.png')}}" alt="1597660666048"></p>
-                    <h3 id="-">提交修改</h3>
-                    <p>在完成上述数据修改、添加或删除动作后，点击『提交修改』按钮，即可将所有修改、添加、删除的数据更新到数据库中，并得到更新后的数据。</p>
-                    <h2 id="-">下载数据</h2>
-                    <p>在完成筛选或提交修改后，可点击『点击下载』按钮，即可下载当前显示数据的Excel文件。</p>
-
-                </article>
-            </div>
+            </li>
+            <li>
+                <p>2020-8-20</p>
+                <ul>
+                    <li>修复上传数据时，数据类型检测问题</li>
+                    <li>修复<code>unable to rollback</code>问题</li>
+                </ul>
+            </li>
+            <li>
+                <p>2020-8-21</p>
+                <ul>
+                    <li>添加<code>直接下载</code>功能</li>
+                    <li>添加首页聚合新闻</li>
+                </ul>
+            </li>
+            <li>
+                <p>2020-8-24</p>
+                <ul>
+                    <li>添加西安市教育局通知公告爬虫</li>
+                    <li>添加知乎用户基本信息&amp;动态爬虫</li>
+                </ul>
+            </li>
+        </ul>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <div class="float-pic">
+            <a href="/"><img src="../static/img/home.png"></a>
         </div>
     </div>
+
 </body>
 
 </html>
-<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-1.4.4.min.js')}}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.ztree.all-3.5.min.js')}}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/ztree_toc.js')}}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/toc_conf.js')}}"></script>
-
-<SCRIPT type="text/javascript">
-    $(document).ready(function() {
-        var css_conf = eval(markdown_panel_style);
-        $('#readme').css(css_conf)
-
-        var conf = eval(jquery_ztree_toc_opts);
-        $('#tree').ztree_toc(conf);
-    });
-</SCRIPT>
