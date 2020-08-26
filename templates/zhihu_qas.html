@@ -1,5 +1,5 @@
 {% extends "homepage.html" %} {% block database_manager %}
-<h2 class="text-center mt-3 ">知乎用户动态爬虫</h2>
+<h2 class="text-center mt-3 ">知乎问题回答爬虫</h2>
 
 
 <form action="" method="POST" enctype=multipart/form-data name="date_form">
@@ -10,7 +10,7 @@
             <!-- Date Picker Input -->
             <div class="form-group mb-4">
 
-                <input type="text" placeholder="在此处粘贴用户主页链接" class="form-control py-4 px-4" name='user_homepage' required>
+                <input type="text" placeholder="在此处粘贴问题页链接" class="form-control py-4 px-4" name='user_homepage' required>
 
             </div>
 
@@ -55,7 +55,7 @@
         }, 500);
 
         // 指当前页面的url
-        var this_url = '/progress_data/' + uuid + '&' + user_name
+        var this_url = '/progress_data/' + uuid + '&' + user_name + '&' + 'zhihu_qas'
         console.log(user_name);
         $.getJSON(this_url, function(res) {
             clearInterval(sitv);
@@ -81,7 +81,7 @@
     }
 
     function download_file() {
-        document.date_form.action = "/download/zhihu_user.zip";
+        document.date_form.action = "/download/zhihu_question_answers.xlsx";
         document.date_form.submit();
     }
 </script>

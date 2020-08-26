@@ -154,6 +154,7 @@ def download_file(filename):
         zip_dir('./docs/zhihu','./docs/zhihu_user.zip')
     else:
         pass
+    
     response = make_response(send_from_directory(
         './docs/', filename, as_attachment=True))
     response.headers["Content-Disposition"] = "attachment; filename={}".format(
@@ -203,11 +204,19 @@ def go_xian_edu_spyder():
 
     )
 
-@app.route('/zhihu_spyder')
-def go_zhihu_spyder():
+@app.route('/zhihu_activities')
+def go_zhihu_activities():
 
     return render_template(
-        'zhihu_spyder.html',
+        'zhihu_activities.html',
+
+    )
+
+@app.route('/zhihu_qas')
+def go_zhihu_qas():
+
+    return render_template(
+        'zhihu_qas.html',
 
     )
 
@@ -223,20 +232,26 @@ per_data = {}
 
 @app.route('/progress_data/<uuid>')
 def progress_data(uuid):
-    print(uuid)
+    
     split_lst = uuid.split('&')
-    print(split_lst)
-    if len(split_lst) == 3:
-        uuid,start_date,end_date = split_lst
+    # 检查标志位
+    
+    if split_lst[-1] == 'xian_edu':
+        uuid,start_date,end_date = split_lst[:-1]
         print(uuid,start_date,end_date)
         scraper = xian_edu_scraper(start_date,end_date)
-    else:
-        uuid,user_name = split_lst
+    elif split_lst[-1] == 'zhihu_activities':
+        uuid,user_name = split_lst[:-1]
         user_homepage = f'https://www.zhihu.com/people/{user_name}'
         user_info_data = get_user_details(user_homepage)
         start_url = user_info_data.loc[0,'start_url']
         scraper = scrap_user_activities(start_url)
-        
+    elif split_lst[-1] == 'zhihu_qas':
+        uuid,question_id = split_lst[:-1]
+        question_url = f'https://www.zhihu.com/question/{question_id}'
+        scraper = get_question_answers(question_url)
+    else:
+        pass
     for total,done in scraper:
         num_progress = round(int(done) * 100 / int(total), 2)
         print(num_progress)
