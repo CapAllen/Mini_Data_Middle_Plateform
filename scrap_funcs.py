@@ -572,7 +572,8 @@ def get_question_answers(url):
         flag = paging_json['is_end']
         next_url = paging_json['next']
         yield(total_answers,all_df.shape[0])
-
+    
+    yield(total_answers,total_answers)
     all_df = all_df.reset_index(drop=True)
     # 简单清洗
     all_df_for_save = all_df.copy()
