@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import copy
 import zipfile
 from database import *
 from scrap_funcs import *
@@ -76,6 +77,7 @@ def go_crud():
 @app.route('/crud_result', methods=['GET', 'POST'])
 def go_crud_result():
     if request.method == 'POST':
+        print(request.form)
         table_name = request.form['db_name']
         table_name_ch = database_info[table_name]['in_chinese']
         cc_lst = list(database_info[table_name]['c_c_dict'].items())[1:]
@@ -87,12 +89,21 @@ def go_crud_result():
         r.set('recent_query', str(dict(eval(imut_str[imut_str.index('('):]))))
 
         print(result_data.shape)
+        print(result_data.columns)
+        c_c_dict = database_info[table_name]['c_c_dict']
+        c_c_dict_render = c_c_dict
 
+        
+        if 'yxdm' in result_data.columns:
+            c_c_dict_with_common = copy.deepcopy(c_c_dict)
+            c_c_dict_with_common.update(database_info['gdyxjbxx__1']['c_c_dict'])
+            c_c_dict_render = c_c_dict_with_common
+        
         return render_template('crud_result.html',
                                table_name=table_name,
                                table_name_ch=table_name_ch,
                                cc_lst=cc_lst,
-                               database_info=database_info,
+                               c_c_dict=c_c_dict_render,
                                result_data=result_data)
         #    ,
         #    database_info=database_info)
@@ -123,6 +134,11 @@ def go_crud_edit():
 
         # 按最近一次的筛选条件返回操作后的数据
         result_data = query_data(recent_query)
+
+        if 'yxdm' in result_data.columns:
+
+            database_info[table_name]['c_c_dict'].update(database_info['gdyxjbxx__1']['c_c_dict'])
+            print(database_info[table_name]['c_c_dict'])
 
         return render_template('crud_edit.html',
                                table_name=table_name,
@@ -238,7 +254,7 @@ def progress_data(uuid):
     
     if split_lst[-1] == 'xian_edu':
         uuid,start_date,end_date = split_lst[:-1]
-        print(uuid,start_date,end_date)
+        print(start_date,end_date)
         scraper = xian_edu_scraper(start_date,end_date)
     elif split_lst[-1] == 'zhihu_activities':
         uuid,user_name = split_lst[:-1]

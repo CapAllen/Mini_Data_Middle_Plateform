@@ -7,8 +7,8 @@
                 <tr>
                     <th>标记删除</th>
                     {% for col in result_data.columns.tolist()[1:] %} {% if 'sort' not in col %}
-                    <th data-sortable="true" title="{{database_info[table_name]['c_c_dict'][col]}}">
-                        {{database_info[table_name]['c_c_dict'][col]}}
+                    <th data-sortable="true" title="{{c_c_dict[col]}}">
+                        {{c_c_dict[col]}}
                     </th>
                     {% endif %} {% endfor %}
                 </tr>

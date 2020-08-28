@@ -1,1 +1,1 @@
-[('http://edu.xa.gov.cn/xwzx/tzgg/5f3e41befd850845e6db6941.html', 'http://www.xa.gov.cn/web_files/attachment/202008/20/20200820172531387746057341912354816.pdf'), 'http://edu.xa.gov.cn/xwzx/tzgg/5f36448ef99d650300f766bc.html', ('http://edu.xa.gov.cn/xwzx/tzgg/5f34b8bd65cbd82d5b549a01.html', 'http://www.xa.gov.cn/web_files/attachment/202008/13/20200813114903452743435952516632576.pdf')]
+[]
