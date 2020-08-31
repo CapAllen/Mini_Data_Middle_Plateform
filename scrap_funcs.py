@@ -12,6 +12,9 @@ import numpy as np
 import pandas as pd
 import random
 
+import base64
+
+
 # 解决json保存datetime格式报错问题
 class DateEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -615,8 +618,161 @@ def get_question_answers(url):
 
 
 
+# sneac爬虫
+def fk_yzm():
+    yanzhengma_url = 'https://www.sneac.com/system/resource/js/filedownload/createimage.jsp?randnum=1598602886693'
+    # 获取验证码（下载附件会弹出验证码）
+    res = requests.get(yanzhengma_url)
+    cookies = res.cookies.get_dict()
+    img = base64.b64encode(res.content)
+    # 百度AIP识别
+    params = {"image":img}
+    access_token = '24.37bcd1ba32fac96816b58611b386ec85.2592000.1601192213.282335-15840866'
+    
+    request_url = "https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic"
+    request_url = request_url + "?access_token=" + access_token
+    headers = {'content-type': 'application/x-www-form-urlencoded'}
+    response = requests.post(request_url, data=params, headers=headers)
+    yanzhengma = response.json()['words_result'][0]['words']
+    
+    return yanzhengma,cookies
 
+def url2soup(url):
+    headers = {
+        'Host': 'www.sneac.com',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+        'Accept-Encoding': 'gzip, deflate',
+    }
 
+    return(BeautifulSoup(requests.get(url, headers=headers).content, 'lxml'))
+
+def save_article(title, article_url, post_date):
+
+    headers = {
+        'Host': 'www.sneac.com',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+        'Accept-Encoding': 'gzip, deflate',
+    }
+    base_url = 'http://www.sneac.com/'
+    
+    post_date = post_date.replace('/', '-')
+    file_path = f'./docs/sneac_edu/{post_date}-{title}/'
+
+    if not os.path.exists(file_path):
+        os.makedirs(file_path)
+
+    # 添加header
+    opener = urllib.request.build_opener()
+    opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+    urllib.request.install_opener(opener)
+
+    # 先判断url
+    if 'www' in article_url:
+        urlretrieve(article_url, file_path+title+'.html')
+    else:
+        article_url = base_url + article_url.split('../')[-1]
+        article_soup = url2soup(article_url)
+        content = article_soup.find('div', class_='v_news_content')
+        with open(file_path+title+'.html', 'w', encoding='utf-8') as f:
+            f.write(str(content))
+
+        # 文章内附件
+        article_addon_list = content.find_all('a')
+        if article_addon_list:
+            for item in article_addon_list:
+                try:
+                    if 'www' in item['href']:
+                        aa_url = item['href']
+                    else:
+                        aa_url = base_url + item['href'][5:]
+                    aa_name = item.get_text() + '.' + aa_url.split('.')[-1]
+                    aa_name = aa_name.replace('/', '-')
+                    urllib.request.urlretrieve(aa_url, file_path+aa_name)
+                except:
+                    pass
+        # 文末附件
+    #     try:
+        addons_list = article_soup.find('div', id='div_vote_id').find_all('li')
+        if addons_list:
+            for item in addons_list:
+                #                 print(item)
+
+                addon_name = item.find('a').get_text()
+                addon_name = addon_name.replace('/', '-')
+                addon_url = base_url + item.find('a')['href']
+                # 验证码
+                yanzhengma, cookies = fk_yzm()
+                addon_url_with_code = addon_url + f'&codeValue={yanzhengma}'
+                res = requests.get(addon_url_with_code, headers=headers, cookies=cookies)
+                # 有时候sneac会自己判断错误，所以只能重试，次数最多为10次
+                count = 0
+                while BeautifulSoup(res.content,'lxml').find('h1') and count<10:
+                    yanzhengma, cookies = fk_yzm()
+                    addon_url_with_code = addon_url + f'&codeValue={yanzhengma}'
+                    res = requests.get(addon_url_with_code, headers=headers, cookies=cookies)
+                    count+=1
+                # 保存
+                with open( file_path+addon_name,'wb') as f:
+                    f.write(res.content)
+#     except:
+#         pass
+        # 保存图片
+        img_name = 1
+        for img_item in content.find_all('img'):
+            img_url = img_item['src']
+            if 'http://' not in img_url:
+                img_url = base_url + img_url
+
+            urllib.request.urlretrieve(img_url, f'{file_path}{img_name}.jpg')
+            img_name += 1
+
+def sneac_spyder(start_date, end_date, tpe):
+    # 清空文件夹
+    if os.path.exists('./docs/sneac_edu/'):
+        shutil.rmtree('./docs/sneac_edu/')
+
+    os.mkdir('./docs/sneac_edu/')
+    if tpe == '新闻公告':
+        url = 'https://www.sneac.com/index/xwgg1.htm'
+        flag = 'index'
+    else:
+        url = 'https://www.sneac.com/zkyw/ptgk.htm'
+        flag = 'zkyw'
+    
+    # 先主页获取所有的item_lst
+    date = end_date
+    all_item_lst = []
+    while date > start_date:
+        page_soup = url2soup(url)
+        print(url)
+        item_lst = page_soup.find('div', class_='list-box').find_all('li')
+        all_item_lst += item_lst
+        date = item_lst[-1].find('span').get_text().replace('/', '-')
+        # 下一页链接
+        next_page = page_soup.find('span', class_='p_next p_fun').find('a')['href']
+        if (tpe == '新闻公告') and ('xwgg1' not in next_page):
+            url = f'https://www.sneac.com/{flag}/xwgg1/' + next_page
+        else:
+            url = f'https://www.sneac.com/{flag}/' + next_page
+            
+        # 截断多余条目
+        all_item_lst = [item for item in all_item_lst if item.find(
+            'span').get_text().replace('/', '-') >= start_date]
+        time.sleep(1)
+
+    for item in all_item_lst:
+        # 标题
+        title = item.find('a').get_text().replace('.', '').replace('/', '')
+        # 文章链接
+        article_url = item.find('a')['href']
+        # 发布时间
+        post_date = item.find('span').get_text().replace('/', '-')
+        save_article(title, article_url, post_date)
+        yield(len(all_item_lst), all_item_lst.index(item)+1)
 
 
 

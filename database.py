@@ -151,21 +151,24 @@ def query_data(form_dict):
 
         # 更改中文列名，提供下载用
         result_4Download = result.rename(columns=lambda x: c_c_dict[x]).drop('id',axis=1)
-        print(result_4Download.columns)
-        # 把年份后的列进行横向拓展
-        year_cols = list(result_4Download.columns)[list(result_4Download.columns).index('年份')+1:]
-        common_cols = list(result_4Download.columns)[:list(result_4Download.columns).index('年份')]
-        
-        result_final = pd.DataFrame()
-        for year in result_4Download['年份'].unique():
-            tmp = result_4Download.query(f'年份=="{year}"')
-            tmp = tmp.rename(columns=lambda x:f'{x}_{year}' if x in year_cols else x)
-            tmp = tmp.drop('年份',axis=1)
-            tmp = tmp.set_index(common_cols)
-            tmp.to_excel('tmp.xlsx',encoding='utf-8-sig')
-            result_final = pd.concat([tmp,result_final],axis=1)
-        
-        result_final = result_final.reset_index()
+
+        # 如果年份在列中的话，则把年份后的列进行横向拓展
+        if '年份' in result_4Download.columns:
+            year_cols = list(result_4Download.columns)[list(result_4Download.columns).index('年份')+1:]
+            common_cols = list(result_4Download.columns)[:list(result_4Download.columns).index('年份')]
+            
+            result_final = pd.DataFrame()
+            for year in result_4Download['年份'].unique():
+                tmp = result_4Download.query(f'年份=="{year}"')
+                tmp = tmp.rename(columns=lambda x:f'{x}_{year}' if x in year_cols else x)
+                tmp = tmp.drop('年份',axis=1)
+                tmp = tmp.set_index(common_cols)
+                tmp.to_excel('tmp.xlsx',encoding='utf-8-sig')
+                result_final = pd.concat([tmp,result_final],axis=1)
+            
+            result_final = result_final.reset_index()
+        else:
+            result_final = result_4Download
 
 
         
@@ -219,6 +222,9 @@ def edit_data(table_name, form_dict, delete_ids):
     c_c_dict = database_info[table_name]['c_c_dict']
     select_lst = list(c_c_dict.keys())
 
+    # 从c_c_dict中筛选出原本属于该数据库的列名
+    form_dict = {key:value for key,value in form_dict.items() if key.split('&')[1] in select_lst}
+    print('xxxxxxxxedit_data',form_dict)
     # 删除数据
     # 删除new的部分
     new_delete_ids = [x.split('&')[0] for x in delete_ids if 'new' in x]

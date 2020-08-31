@@ -135,15 +135,20 @@ def go_crud_edit():
         # 按最近一次的筛选条件返回操作后的数据
         result_data = query_data(recent_query)
 
-        if 'yxdm' in result_data.columns:
+        c_c_dict = database_info[table_name]['c_c_dict']
+        c_c_dict_render = c_c_dict
 
-            database_info[table_name]['c_c_dict'].update(database_info['gdyxjbxx__1']['c_c_dict'])
-            print(database_info[table_name]['c_c_dict'])
+        
+        if 'yxdm' in result_data.columns:
+            c_c_dict_with_common = copy.deepcopy(c_c_dict)
+            c_c_dict_with_common.update(database_info['gdyxjbxx__1']['c_c_dict'])
+            c_c_dict_render = c_c_dict_with_common
 
         return render_template('crud_edit.html',
                                table_name=table_name,
                                table_name_ch=table_name_ch,
                                cc_lst=cc_lst,
+                               c_c_dict=c_c_dict_render,
                                database_info=database_info,
                                result_data=result_data
                                )
@@ -168,6 +173,8 @@ def download_file(filename):
         zip_dir('./docs/xian_edu','./docs/xian_edu_tzgg.zip')
     elif filename == 'zhihu_user.zip':
         zip_dir('./docs/zhihu','./docs/zhihu_user.zip')
+    elif filename == 'sneac.zip':
+        zip_dir('./docs/sneac_edu','./docs/sneac.zip')
     else:
         pass
     
@@ -220,6 +227,14 @@ def go_xian_edu_spyder():
 
     )
 
+@app.route('/sneac_spyder')
+def go_sneac_spyder():
+
+    return render_template(
+        'sneac_spyder.html',
+
+    )
+
 @app.route('/zhihu_activities')
 def go_zhihu_activities():
 
@@ -266,6 +281,9 @@ def progress_data(uuid):
         uuid,question_id = split_lst[:-1]
         question_url = f'https://www.zhihu.com/question/{question_id}'
         scraper = get_question_answers(question_url)
+    elif split_lst[-1] == 'sneac':
+        uuid,start_date,end_date,tpe = split_lst[:-1]
+        scraper = sneac_spyder(start_date,end_date,tpe)
     else:
         pass
     for total,done in scraper:
