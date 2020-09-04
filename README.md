@@ -1,7 +1,7 @@
 # 数据微中台
 ## 1.项目概览
 
-![](./static/img/structure.png)
+![wF712R.png](https://s1.ax1x.com/2020/09/04/wF712R.png)
 
 本项目基于Python+Flask+MySQL+Redis搭建，丰富的注释&面向对象方法，可以让你快速上手&个性化拓展，适用于团队内部快速获取信息、分享数据、产出数据产品，无需编程技能，便可实现：
 
@@ -26,7 +26,7 @@
 
 产品截图：
 
-![](./static/img/demo.gif)
+![wF7GKx.gif](https://s1.ax1x.com/2020/09/04/wF7GKx.gif)
 
 
 
@@ -70,7 +70,7 @@
 
 **ENJOY !**
 
-![](./static/img/giphy.webp)
+![](https://gitee.com/capallen/files_blocked/raw/master/giphy.webp)
 
 
 
