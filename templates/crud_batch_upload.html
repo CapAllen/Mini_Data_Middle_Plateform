@@ -1,0 +1,39 @@
+{% extends "homepage.html" %} {% block database_manager %}
+
+<div class="alert alert-success mt-5" role="alert">
+    <h4 class="alert-heading">你正在准备给数据库『{{table_name_cn}}』上传数据！</h4>
+    <p>数据中包含的列名为：{{columns_lst_cn}}</p>
+    <hr>
+    <p class="mb-0">请注意<strong>列名及数据类型</strong>一定要<strong>与数据库完全一致</strong>（顺序无所谓）</p>
+</div>
+
+<form action="" method="POST" name="batch_upload" enctype=multipart/form-data>
+
+
+    <div class="form-group">
+        <input name="tag" type="hidden" value="batch_upload">
+        <input name="db_name" type="hidden" value="{{table_name}}">
+        <input type="file" name="upload_file" class="form-control-file" accept=".xls,.xlsx" required>
+    </div>
+    <button onclick="confirm_change()" type="button" class="btn btn-primary mt-5">提交</button>
+</form>
+{% block crud_edit %} {% endblock %}
+
+<script type=text/javascript>
+    // 点击确认
+    function confirm_change() {
+        var msg = "请确认上传数据与数据库对应，\n\n无误请点确定。";
+        if (confirm(msg) == true) {
+            return edit();
+        } else {
+            return false;
+        }
+    }
+
+    // 跳转上传
+    function edit() {　　　　　
+        document.batch_upload.action = "/crud_create";
+        document.batch_upload.submit();
+    }
+</script>
+{% endblock %}

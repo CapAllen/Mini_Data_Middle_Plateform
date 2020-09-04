@@ -128,7 +128,6 @@ def go_crud_edit():
         imut_tuple = eval(imut_str[imut_str.index('('):])
         delete_ids = [x[1] for x in imut_tuple if x[0] == 'select']
 
-        print(delete_ids)
         # 依据edit_dict进行mysql操作
         edit_data(table_name, edit_dict, delete_ids)
 
@@ -190,6 +189,25 @@ def go_upload():
     return render_template('upload.html')
 
 
+@app.route('/crud_batch_upload', methods=['GET', 'POST'])
+def go_crud_batch_upload():
+    
+    # 读取最近一次的筛选信息
+    recent_query = eval(r.get('recent_query'))
+
+    table_name = recent_query['db_name']
+    table_name_cn = database_info[table_name]['in_chinese']
+    columns_lst_cn = '，'.join(list(database_info[table_name]['c_c_dict'].values())[1:])
+
+    return render_template(
+        'crud_batch_upload.html',
+        table_name=table_name,
+        table_name_cn=table_name_cn,
+        columns_lst_cn=columns_lst_cn
+
+    )
+
+
 @app.route("/crud_create",  methods=['POST'])
 def go_crud_create():
 
@@ -205,19 +223,24 @@ def go_crud_create():
         upload_file.filename.split('.')[-1]  # 获取文件名
     filelocation = os.path.join('docs/', filename)
     upload_file.save(filelocation)  # 保存文件
-    print('save.')
 
     edit_dict = request.form
-    create_data(edit_dict)
+
+    if edit_dict.get('tag'):
+        # 批量添加
+        batch_upload_data(edit_dict)
+    else: 
+        # 新建数据库
+        create_data(edit_dict)
 
     tables = pd.read_sql('show tables', con=con)['Tables_in_gaokao']
-
     con.close()
 
     return render_template(
         'crud_create.html',
         tables=tables,
         database_info=database_info)
+
 
 @app.route('/xian_edu_spyder')
 def go_xian_edu_spyder():

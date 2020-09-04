@@ -8,8 +8,14 @@ import redis
 import pymysql
 import config
 import pandas as pd
+import numpy as np
 from xpinyin import Pinyin
+from database_helper import *
 
+# 个性化拓展字典
+database_helper_dict = {
+    '20192020_nmntdfsx':unstack_20192020_nmntdfsx
+}
 
 # 初始化pinyin
 p = Pinyin()
@@ -28,6 +34,11 @@ r = redis.Redis(connection_pool=pool)
 
 # 提取中文，转换拼音，拼接返回
 def format_string(x):
+
+    if str(x) == 'nan':
+        return ''
+
+    x = str(x)
     # 提取中文
     ch_part = re.findall(r"[\u4e00-\u9fa5]+", x)
     ch_part = '_'.join(ch_part)
@@ -151,30 +162,30 @@ def query_data(form_dict):
 
         # 更改中文列名，提供下载用
         result_4Download = result.rename(columns=lambda x: c_c_dict[x]).drop('id',axis=1)
+        
+        # 个性化拓展
+        if database_helper_dict.get(table_name):
+            result_final = database_helper_dict[table_name](result_4Download)
 
-        # 如果年份在列中的话，则把年份后的列进行横向拓展
-        if '年份' in result_4Download.columns:
-            year_cols = list(result_4Download.columns)[list(result_4Download.columns).index('年份')+1:]
-            common_cols = list(result_4Download.columns)[:list(result_4Download.columns).index('年份')]
-            
-            result_final = pd.DataFrame()
-            for year in result_4Download['年份'].unique():
-                tmp = result_4Download.query(f'年份=="{year}"')
-                tmp = tmp.rename(columns=lambda x:f'{x}_{year}' if x in year_cols else x)
-                tmp = tmp.drop('年份',axis=1)
-                tmp = tmp.set_index(common_cols)
-                tmp.to_excel('tmp.xlsx',encoding='utf-8-sig')
-                result_final = pd.concat([tmp,result_final],axis=1)
-            
-            result_final = result_final.reset_index()
         else:
-            result_final = result_4Download
+            # 如果年份在列中的话，则把年份后的列进行横向拓展
+            if '年份' in result_4Download.columns:
+                year_cols = list(result_4Download.columns)[list(result_4Download.columns).index('年份')+1:]
+                common_cols = list(result_4Download.columns)[:list(result_4Download.columns).index('年份')]
+                
+                result_final = pd.DataFrame()
+                for year in result_4Download['年份'].unique():
+                    tmp = result_4Download.query(f'年份=="{year}"')
+                    tmp = tmp.rename(columns=lambda x:f'{x}_{year}' if x in year_cols else x)
+                    tmp = tmp.drop('年份',axis=1)
+                    tmp = tmp.set_index(common_cols)
+                    tmp.to_excel('tmp.xlsx',encoding='utf-8-sig')
+                    result_final = pd.concat([tmp,result_final],axis=1)
+                
+                result_final = result_final.reset_index()
+            else:
+                result_final = result_4Download
 
-
-        
-
-
-        
         # 如果院校代码（yxdm）在columns中，则JOIN上高等院校基本信息
         if ('yxdm' in result.columns) and ('211_gcgx' not in result.columns):
             uni_base_infos = pd.read_sql('SELECT * FROM gaokao.gdyxjbxx__1',con=con).drop(['id','yxmc'],axis=1)
@@ -222,9 +233,6 @@ def edit_data(table_name, form_dict, delete_ids):
     c_c_dict = database_info[table_name]['c_c_dict']
     select_lst = list(c_c_dict.keys())
 
-    # 从c_c_dict中筛选出原本属于该数据库的列名
-    form_dict = {key:value for key,value in form_dict.items() if key.split('&')[1] in select_lst}
-    print('xxxxxxxxedit_data',form_dict)
     # 删除数据
     # 删除new的部分
     new_delete_ids = [x.split('&')[0] for x in delete_ids if 'new' in x]
@@ -243,14 +251,16 @@ def edit_data(table_name, form_dict, delete_ids):
     form_dict = {key: value for key,
                  value in form_dict.items() if 'select' not in key}
 
+    # 从c_c_dict中筛选出原本属于该数据库的列名
+    form_dict = {key:value for key,value in form_dict.items() if key.split('&')[1] in select_lst}
+
     # 去除被select选中的条目
-    new = [x for x in list(form_dict.keys())[1:] if ('new' in x) and (x not in new_delete_ids)]
-    old = [x for x in list(form_dict.keys())[1:] if x not in new + delete_ids]
+    new = [x.split('&')[0] for x in list(form_dict.keys())[1:] if ('new' in x) and (x.split('&')[0] not in new_delete_ids)]
+    old = [x.split('&')[0] for x in list(form_dict.keys())[1:] if x.split('&')[0] not in new + delete_ids]
 
 
-    new = sorted(list(set([x.split('&')[0] for x in new])))
-    new = [x for x in new if x not in new_delete_ids]
-    old = sorted(list(set([x.split('&')[0] for x in old])))
+    new = sorted(list(set([x for x in new])))
+    old = sorted(list(set([x for x in old])))
 
     # 修改一条旧数据
     def edit_old_data(old_id):
@@ -320,9 +330,6 @@ def create_data(form_dict):
         # 防止重名
         col_en = chongming(col_en,c_c_dict)
         c_c_dict[col_en] = col
-    # 把共有列更新进去
-    if '院校代码' in col_names:
-        c_c_dict.update(database_info['gdyxjbxx__1']['c_c_dict'])
 
     reverse_c_c_dict = {value: key for key, value in c_c_dict.items()}
     # 重命名df
@@ -364,9 +371,6 @@ def create_data(form_dict):
         else:
             new_df[col] = new_df[col].fillna('-')
     
-    # 把共有列更新进去
-    if '院校代码' in col_names:
-        dtype_dict.update(database_info['gdyxjbxx__1']['dtype_dict'])
 
     db_en = format_string(form_dict['db_name'])
     # 防止重名
@@ -387,7 +391,6 @@ def create_data(form_dict):
         create_str += f"{col_name} {col_dtype} NULL,"
 
     create_str += 'PRIMARY KEY (id));'
-    print(create_str)
     cursor = con.cursor()
     cursor.execute(create_str)
     # 导入数据
@@ -418,6 +421,59 @@ def create_data(form_dict):
     database_info.update(new_db_dict)
     with open('docs/database_info.json','w',encoding='utf-8') as f:
         f.write(json.dumps(database_info,ensure_ascii=False))
+    
+    con.close()
+
+# 批量上传数据
+def batch_upload_data(form_dict):
+    table_name = form_dict.get('db_name')
+
+    # connect mysql
+    con = pymysql.connect(
+        host=config.HOST,
+        user=config.USER,
+        password=config.PW,
+        database=config.DB)
+
+    # 读取上传的文件
+    filename = [file for file in os.listdir('docs/') if 'upload_file' in file][0]
+    new_df = pd.read_excel(os.path.join('docs/',filename))
+    
+    new_df = new_df.rename(columns={'id':'ID'})
+    # 给new_df 创建自增id列
+    new_df = new_df.reset_index(drop=True).reset_index().rename(columns={'index':'id'})
+    # 更新id，以免重复
+    max_id = pd.read_sql(f'SELECT MAX(id) FROM gaokao.{table_name}', con=con)
+    max_id = int(max_id.iloc[0, 0])
+    print('max_id',max_id)
+
+    new_df['id'] = range(max_id+1,new_df.shape[0]+max_id+1)
+
+    c_c_dict = database_info[table_name]['c_c_dict']
+    
+    reverse_c_c_dict = {value: key for key, value in c_c_dict.items()}
+    # 重命名df
+    new_df = new_df.rename(columns=lambda x:reverse_c_c_dict[x])
+    en_cols = ','.join(new_df.columns)
+    # 读取列属性
+    dtype_dict = database_info[table_name]['dtype_dict']
+
+    # 将新数据添加到原数据中
+    cursor = con.cursor()
+    # 导入数据
+    for i in new_df.index:
+        value_str = ''
+        for col in new_df.columns:
+            value_str += f'"{eval(dtype_dict[col])(new_df.loc[i,col])}",'
+            
+        insert_str = f"INSERT INTO {table_name} ({en_cols}) VALUES ({value_str[:-1]});"
+
+        try:
+            cursor.execute(insert_str)
+        except:
+            print(insert_str)
+
+    con.commit()
     
     con.close()
 

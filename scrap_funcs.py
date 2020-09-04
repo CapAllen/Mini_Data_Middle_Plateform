@@ -13,7 +13,7 @@ import pandas as pd
 import random
 
 import base64
-
+import config
 
 # 解决json保存datetime格式报错问题
 class DateEncoder(json.JSONEncoder):
@@ -627,7 +627,7 @@ def fk_yzm():
     img = base64.b64encode(res.content)
     # 百度AIP识别
     params = {"image":img}
-    access_token = '24.37bcd1ba32fac96816b58611b386ec85.2592000.1601192213.282335-15840866'
+    access_token = config.baidu_aip_token
     
     request_url = "https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic"
     request_url = request_url + "?access_token=" + access_token

@@ -30,6 +30,7 @@
 
     <button id="addRow" type="button" class="btn btn-primary mt-5">添加一行</button>
     <button onclick="confirm_change()" type="button" class="btn btn-primary mt-5">提交修改</button>
+    <button onclick="batch_upload()" type="button" class="btn btn-primary mt-5">批量上传</button>
     <button onclick="download_file()" type="button" class="btn btn-primary mt-5">点击下载</button>
 
 </form>
@@ -57,6 +58,13 @@
         document.idiot.action = "/crud_edit";
         document.idiot.submit();
     }
+
+    // 跳转批量上传
+    function batch_upload() {　　　　　
+        document.idiot.action = "/crud_batch_upload";
+        document.idiot.submit();
+    }
+
 
     $(function() {
 
